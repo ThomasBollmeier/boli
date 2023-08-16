@@ -1,4 +1,5 @@
-from tokens import Token, TokenType
+from boli.tokens import Token, TokenType
+from boli.buffered_source import BufferedSource
 
 
 class Lexer:
@@ -6,7 +7,7 @@ class Lexer:
     def __init__(self, source):
         self._column = 1
         self._line = 1
-        self._source = source
+        self._source = BufferedSource(source)
         self._whitespace = [" ", "\t", "\r", "\n"]
 
     def next_token(self):
@@ -27,6 +28,8 @@ class Lexer:
             return Token(TokenType.RIGHT_BRACKET, ch, line, column)
         elif ch == '"':
             return self._scan_string(line, column)
+        elif ch.isdigit():
+            return self._scan_number(ch, line, column)
         else:
             return Token(TokenType.UNKNOWN, ch, line, column)
 
@@ -42,6 +45,16 @@ class Lexer:
                     return Token(TokenType.STRING, s + ch, line, column)
             s += ch
             prev_ch = ch
+
+    def _scan_number(self, first_digit_ch, line, column):
+        num_str = first_digit_ch
+        while True:
+            ch = self._source.peek()
+            if ch is None or not ch.isdigit():
+                break
+            num_str += ch
+            self._next_char()
+        return Token(TokenType.NUMBER, num_str, line, column)
 
     def _skip_whitespace(self) -> tuple:
         while True:
@@ -61,20 +74,3 @@ class Lexer:
                 self._line += 1
                 self._column = 1
         return ch, line, column
-
-
-if __name__ == "__main__":
-
-    from source import Source
-
-#           12345678901234567890123
-#           ( ( ) {} [] "\"Test\"")
-    code = "( ( ) {} [] \"\\\"Test\\\"\")"
-    lexer = Lexer(Source(code))
-
-    while True:
-        token = lexer.next_token()
-        print(token.token_type, token.lexeme, token.line, token.col)
-        if token.token_type == TokenType.END_OF_INPUT:
-            break
-
