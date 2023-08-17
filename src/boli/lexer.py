@@ -1,4 +1,4 @@
-from boli.tokens import Token, TokenType
+from boli.tokens import *
 from boli.buffered_source import BufferedSource
 
 
@@ -13,38 +13,55 @@ class Lexer:
     def next_token(self):
         ch, line, column = self._skip_whitespace()
         if ch is None:
-            return Token(TokenType.END_OF_INPUT, "", line, column)
-        elif ch == "(":
-            return Token(TokenType.LEFT_PAREN, ch, line, column)
-        elif ch == ")":
-            return Token(TokenType.RIGHT_PAREN, ch, line, column)
-        elif ch == "{":
-            return Token(TokenType.LEFT_BRACE, ch, line, column)
-        elif ch == "}":
-            return Token(TokenType.RIGHT_BRACE, ch, line, column)
-        elif ch == "[":
-            return Token(TokenType.LEFT_BRACKET, ch, line, column)
-        elif ch == "]":
-            return Token(TokenType.RIGHT_BRACKET, ch, line, column)
+            return Token(TokenType.END_OF_INPUT, line, column)
+        elif ch in TOKENS_1:
+            return Token(TOKENS_1[ch], line, column)
         elif ch == '"':
             return self._scan_string(line, column)
         elif ch.isdigit():
             return self._scan_number(ch, line, column)
         else:
-            return Token(TokenType.UNKNOWN, ch, line, column)
+            return self._scan_identifier(ch, line, column)
+
+    def _scan_identifier(self, start_ch, line, column):
+        forbidden_start = set(["!", "?"])
+        if start_ch in forbidden_start:
+            return UnknownToken(line, column, start_ch)
+        name = start_ch
+        while True:
+            ch = self._source.peek()
+            if ch is None or not self._is_valid_ident_char(ch):
+                break
+            name += ch
+            self._next_char()
+        if name not in KEYWORDS:
+            return IdentifierToken(line, column, name)
+        else:
+            return Token(KEYWORDS[name], line, column)
+
+    def _is_valid_ident_char(self, ch):
+        if ch in self._whitespace:
+            return False
+        if ch in set(list('"(){}[]/')):
+            return False
+        return True
 
     def _scan_string(self, line, column):
-        s = '"'
+        s = ''
         prev_ch = None
         while True:
             ch = self._next_char()[0]
             if ch is None:
-                return Token(TokenType.UNKNOWN, s, line, column)
+                return StringToken(line, column, self._convert_str(s))
             elif ch == '"':
                 if prev_ch != "\\":
-                    return Token(TokenType.STRING, s + ch, line, column)
+                    return StringToken(line, column, self._convert_str(s))
             s += ch
             prev_ch = ch
+
+    @staticmethod
+    def _convert_str(s):
+        return s.replace(r'\"', '"')
 
     def _scan_number(self, first_digit_ch, line, column):
         num_str = first_digit_ch
@@ -54,7 +71,7 @@ class Lexer:
                 break
             num_str += ch
             self._next_char()
-        return Token(TokenType.NUMBER, num_str, line, column)
+        return NumberToken(line, column, float(num_str))
 
     def _skip_whitespace(self) -> tuple:
         while True:
