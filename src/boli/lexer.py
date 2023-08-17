@@ -14,6 +14,12 @@ class Lexer:
         ch, line, column = self._skip_whitespace()
         if ch is None:
             return Token(TokenType.END_OF_INPUT, line, column)
+        elif ch == "-":
+            next_ch = self._source.peek()
+            if next_ch is not None and next_ch.isdigit():
+                return self._scan_number(ch, line, column)
+            else:
+                return Token(TOKENS_1[ch], line, column)
         elif ch in TOKENS_1:
             return Token(TOKENS_1[ch], line, column)
         elif ch == '"':
@@ -23,8 +29,19 @@ class Lexer:
         else:
             return self._scan_identifier(ch, line, column)
 
+    def fetch_all_tokens(self, include_end_of_input=True):
+        tokens = []
+        while True:
+            token = self.next_token()
+            if token.token_type == TokenType.END_OF_INPUT:
+                if include_end_of_input:
+                    tokens.append(token)
+                break
+            tokens.append(token)
+        return tokens
+
     def _scan_identifier(self, start_ch, line, column):
-        forbidden_start = set(["!", "?"])
+        forbidden_start = {"!", "?", ".", ","}
         if start_ch in forbidden_start:
             return UnknownToken(line, column, start_ch)
         name = start_ch + self._scan_while(self._is_valid_ident_char)
@@ -69,6 +86,18 @@ class Lexer:
 
     def _scan_number(self, first_digit_ch, line, column):
         num_str = first_digit_ch + self._scan_while(lambda ch: ch.isdigit())
+        next_ch = self._source.peek()
+
+        if next_ch is None or next_ch != ".":
+            return NumberToken(line, column, float(num_str))
+
+        snd_next_ch = self._source.peek(2)
+        if snd_next_ch is None or not snd_next_ch.isdigit():
+            return NumberToken(line, column, float(num_str))
+
+        self._next_char()
+        num_str += next_ch + self._scan_while(lambda ch: ch.isdigit())
+
         return NumberToken(line, column, float(num_str))
 
     def _skip_whitespace(self) -> tuple:
