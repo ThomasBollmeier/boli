@@ -24,19 +24,3 @@ class BufferedSource:
             return self._buffer[idx]
         else:
             return None
-
-
-if __name__ == "__main__":
-
-    from source import Source
-
-    buf_source = BufferedSource(Source("1234567890"))
-
-    print(buf_source.peek())
-    print(buf_source.next_char())
-    print(buf_source.peek(), buf_source.peek(2))
-    while True:
-        ch = buf_source.next_char()
-        if ch is None:
-            break
-        print(ch)

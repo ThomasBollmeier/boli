@@ -27,17 +27,21 @@ class Lexer:
         forbidden_start = set(["!", "?"])
         if start_ch in forbidden_start:
             return UnknownToken(line, column, start_ch)
-        name = start_ch
-        while True:
-            ch = self._source.peek()
-            if ch is None or not self._is_valid_ident_char(ch):
-                break
-            name += ch
-            self._next_char()
+        name = start_ch + self._scan_while(self._is_valid_ident_char)
         if name not in KEYWORDS:
             return IdentifierToken(line, column, name)
         else:
             return Token(KEYWORDS[name], line, column)
+
+    def _scan_while(self, predicate_fn):
+        ret = ""
+        while True:
+            ch = self._source.peek()
+            if ch is None or not predicate_fn(ch):
+                break
+            ret += ch
+            self._next_char()
+        return ret
 
     def _is_valid_ident_char(self, ch):
         if ch in self._whitespace:
@@ -64,13 +68,7 @@ class Lexer:
         return s.replace(r'\"', '"')
 
     def _scan_number(self, first_digit_ch, line, column):
-        num_str = first_digit_ch
-        while True:
-            ch = self._source.peek()
-            if ch is None or not ch.isdigit():
-                break
-            num_str += ch
-            self._next_char()
+        num_str = first_digit_ch + self._scan_while(lambda ch: ch.isdigit())
         return NumberToken(line, column, float(num_str))
 
     def _skip_whitespace(self) -> tuple:
