@@ -5,7 +5,7 @@ class Source:
         self._pos = 0
         self._max_pos = len(self._content) - 1
 
-    def next_char(self):
+    def advance(self):
         if self._pos > self._max_pos:
             return None
         ret = self._content[self._pos]

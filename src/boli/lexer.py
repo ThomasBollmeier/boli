@@ -10,16 +10,10 @@ class Lexer:
         self._source = BufferedSource(source)
         self._whitespace = [" ", "\t", "\r", "\n"]
 
-    def next_token(self):
+    def advance(self):
         ch, line, column = self._skip_whitespace()
         if ch is None:
-            return Token(TokenType.END_OF_INPUT, line, column)
-        elif ch == "-":
-            next_ch = self._source.peek()
-            if next_ch is not None and next_ch.isdigit():
-                return self._scan_number(ch, line, column)
-            else:
-                return Token(TOKENS_1[ch], line, column)
+            return None
         elif ch in TOKENS_1:
             return Token(TOKENS_1[ch], line, column)
         elif ch == '"':
@@ -29,13 +23,11 @@ class Lexer:
         else:
             return self._scan_identifier(ch, line, column)
 
-    def fetch_all_tokens(self, include_end_of_input=True):
+    def fetch_all_tokens(self):
         tokens = []
         while True:
-            token = self.next_token()
-            if token.token_type == TokenType.END_OF_INPUT:
-                if include_end_of_input:
-                    tokens.append(token)
+            token = self.advance()
+            if token is None:
                 break
             tokens.append(token)
         return tokens
@@ -57,7 +49,7 @@ class Lexer:
             if ch is None or not predicate_fn(ch):
                 break
             ret += ch
-            self._next_char()
+            self._advance_char()
         return ret
 
     def _is_valid_ident_char(self, ch):
@@ -71,7 +63,7 @@ class Lexer:
         s = ''
         prev_ch = None
         while True:
-            ch = self._next_char()[0]
+            ch = self._advance_char()[0]
             if ch is None:
                 return StringToken(line, column, self._convert_str(s))
             elif ch == '"':
@@ -85,30 +77,31 @@ class Lexer:
         return s.replace(r'\"', '"')
 
     def _scan_number(self, first_digit_ch, line, column):
-        num_str = first_digit_ch + self._scan_while(lambda ch: ch.isdigit())
-        next_ch = self._source.peek()
+        num_str = first_digit_ch + self._scan_while(lambda ch: ch.isdigit() or ch == ".")  # grouping by . is supported
+        num_str = num_str.replace(".", "")
 
-        if next_ch is None or next_ch != ".":
-            return NumberToken(line, column, float(num_str))
+        next_two = self._source.peek_many(2)
+        if len(next_two) < 2:
+            return IntNumToken(line, column, int(num_str))
+        fst, snd = next_two
+        if fst != "," or not snd.isdigit():
+            return IntNumToken(line, column, int(num_str))
 
-        snd_next_ch = self._source.peek(2)
-        if snd_next_ch is None or not snd_next_ch.isdigit():
-            return NumberToken(line, column, float(num_str))
-
-        self._next_char()
-        num_str += next_ch + self._scan_while(lambda ch: ch.isdigit())
-
-        return NumberToken(line, column, float(num_str))
+        self._advance_char()
+        num_str += fst + self._scan_while(lambda ch: ch.isdigit() or ch == ".")
+        num_str = num_str.replace(".", "")
+        num_str = num_str.replace(",", ".")
+        return RealNumToken(line, column, float(num_str))
 
     def _skip_whitespace(self) -> tuple:
         while True:
-            ch, line, column = self._next_char()
+            ch, line, column = self._advance_char()
             if ch is None or ch not in self._whitespace:
                 break
         return ch, line, column
 
-    def _next_char(self):
-        ch = self._source.next_char()
+    def _advance_char(self):
+        ch = self._source.advance()
         line = self._line
         column = self._column
         if ch is not None:

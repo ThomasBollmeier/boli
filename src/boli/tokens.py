@@ -7,15 +7,15 @@ class TokenType:
     LEFT_BRACKET = 5
     RIGHT_BRACKET = 6
     IDENT = 7
-    NUMBER = 8
-    STRING = 9
-    DEF = 10
-    IF = 11
-    PLUS = 12
-    MINUS = 13
-    ASTERISK = 14
-    SLASH = 15
-    END_OF_INPUT = 999
+    INT_NUM = 8
+    REAL_NUM = 9
+    STRING = 10
+    DEF = 11
+    IF = 12
+    PLUS = 13
+    MINUS = 14
+    ASTERISK = 15
+    SLASH = 16
     UNKNOWN = -1
 
 
@@ -52,11 +52,18 @@ class StringToken(Token):
         self.str_val = str_val
 
 
-class NumberToken(Token):
+class IntNumToken(Token):
 
-    def __init__(self, line, column, num_val):
-        Token.__init__(self, TokenType.NUMBER, line, column)
-        self.num_val = num_val
+    def __init__(self, line, column, int_val):
+        Token.__init__(self, TokenType.INT_NUM, line, column)
+        self.value = int_val
+
+
+class RealNumToken(Token):
+
+    def __init__(self, line, column, real_val):
+        Token.__init__(self, TokenType.REAL_NUM, line, column)
+        self.value = real_val
 
 
 class IdentifierToken(Token):
