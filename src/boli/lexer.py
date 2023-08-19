@@ -20,6 +20,8 @@ class Lexer:
             return self._scan_string(line, column)
         elif ch.isdigit():
             return self._scan_number(ch, line, column)
+        elif ch == "'":  # quotation
+            return self._scan_quote(line, column)
         else:
             return self._scan_identifier(ch, line, column)
 
@@ -31,6 +33,13 @@ class Lexer:
                 break
             tokens.append(token)
         return tokens
+
+    def _scan_quote(self, line, column):
+        next_ch = self._source.peek()
+        if next_ch is None or next_ch not in {"(", "{", "["}:
+            return UnknownToken(line, column, "'")
+        self._advance_char()
+        return Quote(line, column, "'" + next_ch)
 
     def _scan_identifier(self, start_ch, line, column):
         forbidden_start = {"!", "?", ".", ","}

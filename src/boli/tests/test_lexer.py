@@ -9,11 +9,11 @@ class TestLexer:
     def test_lexer(self):
         code = """
         ( ( ) {} [] "\\"Test\\" 1\\2" 42 is-this-an-identifier? + - * / 
-        def if)
+        def if) ^ %
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
 
-        assert len(tokens) == 17
+        assert len(tokens) == 19
         self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 1, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 2, TokenType.RIGHT_PAREN)
@@ -34,6 +34,8 @@ class TestLexer:
         self._assert_token_type(tokens, 14, TokenType.DEF)
         self._assert_token_type(tokens, 15, TokenType.IF)
         self._assert_token_type(tokens, 16, TokenType.RIGHT_PAREN)
+        self._assert_token_type(tokens,17, TokenType.CARET)
+        self._assert_token_type(tokens,18, TokenType.PERCENT)
 
     @pytest.mark.parametrize("num_str, expected_num_val", [
         ("42", 42),
@@ -47,6 +49,25 @@ class TestLexer:
         num_token = tokens[0]
         assert isinstance(num_token, IntNumToken) or isinstance(num_token, RealNumToken)
         assert num_token.value == expected_num_val
+
+    def test_quote(self):
+        code = """
+        (def my-list '(1 2 3))
+        """
+        tokens = self._create_lexer(code).fetch_all_tokens()
+
+        assert len(tokens) == 9
+        self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
+        self._assert_token_type(tokens, 1, TokenType.DEF)
+        self._assert_token_type(tokens, 2, TokenType.IDENT)
+        assert tokens[2].name == "my-list"
+        self._assert_token_type(tokens, 3, TokenType.QUOTE)
+        assert tokens[3].lexeme == "'("
+        self._assert_token_type(tokens, 4, TokenType.INT_NUM)
+        self._assert_token_type(tokens, 5, TokenType.INT_NUM)
+        self._assert_token_type(tokens, 6, TokenType.INT_NUM)
+        self._assert_token_type(tokens, 7, TokenType.RIGHT_PAREN)
+        self._assert_token_type(tokens, 8, TokenType.RIGHT_PAREN)
 
     @staticmethod
     def _assert_token_type(tokens, idx, expected):

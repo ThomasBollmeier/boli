@@ -16,6 +16,9 @@ class TokenType:
     MINUS = 14
     ASTERISK = 15
     SLASH = 16
+    CARET = 17
+    PERCENT = 18
+    QUOTE = 19
     UNKNOWN = -1
 
 
@@ -29,7 +32,9 @@ TOKENS_1 = {
     "+": TokenType.PLUS,
     "-": TokenType.MINUS,
     "*": TokenType.ASTERISK,
-    "/": TokenType.SLASH
+    "/": TokenType.SLASH,
+    "^": TokenType.CARET,
+    "%": TokenType.PERCENT
 }
 
 KEYWORDS = {
@@ -77,4 +82,11 @@ class UnknownToken(Token):
 
     def __init__(self, line, column, lexeme):
         Token.__init__(self, TokenType.UNKNOWN, line, column)
+        self.lexeme = lexeme
+
+
+class Quote(Token):
+
+    def __init__(self, line, column, lexeme):
+        Token.__init__(self, TokenType.QUOTE, line, column)
         self.lexeme = lexeme
