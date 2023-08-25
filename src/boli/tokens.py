@@ -42,6 +42,15 @@ KEYWORDS = {
     "if": TokenType.IF,
 }
 
+OPERATORS = [
+    TokenType.PLUS,
+    TokenType.MINUS,
+    TokenType.ASTERISK,
+    TokenType.SLASH,
+    TokenType.CARET,
+    TokenType.PERCENT
+]
+
 
 class Token:
     def __init__(self, token_type, line, column):

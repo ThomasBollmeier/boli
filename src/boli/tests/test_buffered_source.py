@@ -1,5 +1,5 @@
 from boli.source import Source
-from boli.buffered_source import BufferedSource
+from boli.buffered_stream import BufferedStream
 
 
 def test_peek():
@@ -10,4 +10,4 @@ def test_peek():
 
 def create_buf_source():
     content = "123456789"
-    return BufferedSource(Source(content))
+    return BufferedStream(Source(content))

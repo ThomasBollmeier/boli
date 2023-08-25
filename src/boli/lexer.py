@@ -1,5 +1,5 @@
 from boli.tokens import *
-from boli.buffered_source import BufferedSource
+from boli.buffered_stream import BufferedStream
 
 
 class Lexer:
@@ -7,7 +7,7 @@ class Lexer:
     def __init__(self, source):
         self._column = 1
         self._line = 1
-        self._source = BufferedSource(source)
+        self._source = BufferedStream(source)
         self._whitespace = [" ", "\t", "\r", "\n"]
 
     def advance(self):

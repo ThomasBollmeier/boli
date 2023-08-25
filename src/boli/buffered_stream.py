@@ -1,4 +1,4 @@
-class BufferedSource:
+class BufferedStream:
 
     def __init__(self, source):
         self._source = source
