@@ -9,7 +9,8 @@ class TestParser:
 
         code = """
         (def answer-to-everything 42)
-        (def ego "Thomas")
+        (def ego "Thomas") ; <- that is me
+        (def my-list '(1 2 3))
         """
 
         parser = Parser(Source(code))

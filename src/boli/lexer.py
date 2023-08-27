@@ -1,6 +1,6 @@
 from boli.tokens import *
 from boli.buffered_stream import BufferedStream
-
+import os
 
 class Lexer:
 
@@ -11,19 +11,22 @@ class Lexer:
         self._whitespace = [" ", "\t", "\r", "\n"]
 
     def advance(self):
-        ch, line, column = self._skip_whitespace()
-        if ch is None:
-            return None
-        elif ch in TOKENS_1:
-            return Token(TOKENS_1[ch], line, column)
-        elif ch == '"':
-            return self._scan_string(line, column)
-        elif ch.isdigit():
-            return self._scan_number(ch, line, column)
-        elif ch == "'":  # quotation
-            return self._scan_quote(line, column)
-        else:
-            return self._scan_identifier(ch, line, column)
+        while True:
+            ch, line, column = self._skip_whitespace()
+            if ch is None:
+                return None
+            elif ch in TOKENS_1:
+                return Token(TOKENS_1[ch], line, column)
+            elif ch == '"':
+                return self._scan_string(line, column)
+            elif ch.isdigit():
+                return self._scan_number(ch, line, column)
+            elif ch == "'":  # quotation
+                return self._scan_quote(line, column)
+            elif ch == ";":  # comment
+                self._skip_line_comment()
+            else:
+                return self._scan_identifier(ch, line, column)
 
     def fetch_all_tokens(self):
         tokens = []
@@ -108,6 +111,11 @@ class Lexer:
             if ch is None or ch not in self._whitespace:
                 break
         return ch, line, column
+
+    def _skip_line_comment(self):
+        ch, _, _ = self._advance_char()
+        while ch != os.linesep:
+            ch, _, _ = self._advance_char()
 
     def _advance_char(self):
         ch = self._source.advance()

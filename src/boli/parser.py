@@ -12,6 +12,7 @@ class Parser:
 
     def __init__(self, source):
         self._lexer = BufferedStream(Lexer(source))
+        self._quotation_level = 0
 
     def program(self) -> Program:
         children = []
@@ -56,8 +57,31 @@ class Parser:
             return Real(token)
         elif token.token_type == TokenType.STRING:
             return String(token)
+        elif token.token_type == TokenType.QUOTE:
+            return self._quote(token)
 
-        raise NotImplementedError()
+        raise ParseError("Could not parse expression!")
+
+    def _quote(self, start):
+        self._quotation_level += 1
+        expected_end = {
+            "(": TokenType.RIGHT_PAREN,
+            "{": TokenType.RIGHT_BRACE,
+            "[": TokenType.RIGHT_BRACKET,
+        }[start.lexeme[1]]
+        elements = []
+
+        while True:
+            next_token = self._lexer.peek()
+            if next_token is None:
+                raise ParseError("Unexpected end of quote expression")
+            if next_token.token_type == expected_end:
+                self._advance()
+                break
+            elements.append(self._expression())
+
+        self._quotation_level -= 1
+        return List(elements)
 
     def _advance(self, expected_token_types = None) -> Token | None:
         token = self._lexer.advance()
