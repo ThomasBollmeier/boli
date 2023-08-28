@@ -55,6 +55,10 @@ class Parser:
             return Real(token)
         elif token.token_type == TokenType.STRING:
             return String(token)
+        elif token.token_type == TokenType.BOOL:
+            return Bool(token)
+        elif token.token_type == TokenType.IDENT:
+            return Identifier(token)
         elif token.token_type in LEFT_TOKENS:
             expected_end = LEFT_TO_RIGHT_MAP[token.token_type]
             if self._quotation_level == 0:

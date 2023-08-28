@@ -9,16 +9,17 @@ class TokenType:
     IDENT = 7
     INT_NUM = 8
     REAL_NUM = 9
-    STRING = 10
-    DEF = 11
-    IF = 12
-    PLUS = 13
-    MINUS = 14
-    ASTERISK = 15
-    SLASH = 16
-    CARET = 17
-    PERCENT = 18
-    QUOTE = 19
+    BOOL = 10
+    STRING = 11
+    DEF = 12
+    IF = 13
+    PLUS = 14
+    MINUS = 15
+    ASTERISK = 16
+    SLASH = 17
+    CARET = 18
+    PERCENT = 19
+    QUOTE = 20
     UNKNOWN = -1
 
 
@@ -90,6 +91,13 @@ class RealNumToken(Token):
     def __init__(self, line, column, real_val):
         Token.__init__(self, TokenType.REAL_NUM, line, column)
         self.value = real_val
+
+
+class BoolToken(Token):
+
+    def __init__(self, line, column, bool_val):
+        Token.__init__(self, TokenType.BOOL, line, column)
+        self.bool_val = bool_val
 
 
 class IdentifierToken(Token):

@@ -34,6 +34,16 @@ class String(Ast):
         visitor.visit_string(self)
 
 
+class Bool(Ast):
+
+    def __init__(self, bool_tok):
+        Ast.__init__(self)
+        self.bool_tok = bool_tok
+
+    def accept(self, visitor):
+        visitor.visit_bool(self)
+
+
 class Identifier(Ast):
 
     def __init__(self, ident_tok):

@@ -17,6 +17,9 @@ class AstPrinter(AstVisitor):
     def visit_string(self, string):
         self._write(f"String({string.str_tok.str_val})")
 
+    def visit_bool(self, boolean):
+        self._write(f"Bool({boolean.bool_tok.bool_val})")
+
     def visit_ident(self, ident):
         self._write(f"Identifier({ident.ident_tok.name})")
 

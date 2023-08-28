@@ -9,6 +9,9 @@ class AstVisitor:
     def visit_string(self, string):
         pass
 
+    def visit_bool(self, boolean):
+        pass
+
     def visit_ident(self, ident):
         pass
 

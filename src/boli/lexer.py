@@ -48,11 +48,16 @@ class Lexer:
         forbidden_start = {"!", "?", ".", ","}
         if start_ch in forbidden_start:
             return UnknownToken(line, column, start_ch)
+
         name = start_ch + self._scan_while(self._is_valid_ident_char)
-        if name not in KEYWORDS:
-            return IdentifierToken(line, column, name)
-        else:
+
+        if name in KEYWORDS:
             return Token(KEYWORDS[name], line, column)
+
+        if name in ["#t", "#true", "#f", "#false"]:
+            return BoolToken(line, column, name.startswith("#t"))
+
+        return IdentifierToken(line, column, name)
 
     def _scan_while(self, predicate_fn):
         ret = ""
