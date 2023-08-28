@@ -1,7 +1,7 @@
 from boli.buffered_stream import BufferedStream
 from boli.lexer import Lexer
 from boli.ast import *
-from boli.tokens import TokenType, Token, OPERATORS
+from boli.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP
 
 
 class ParseError(Exception):
@@ -37,19 +37,17 @@ class Parser:
 
     def _definition(self, left_token_type) -> Ast:
         id_token = self._advance([TokenType.IDENT])
-        identifier = Identifier(id_token.name)
+        identifier = Identifier(id_token)
         expr = self._expression()
-        right_token_type = {
-            TokenType.LEFT_PAREN: TokenType.RIGHT_PAREN,
-            TokenType.LEFT_BRACE: TokenType.RIGHT_BRACE,
-            TokenType.LEFT_BRACKET: TokenType.RIGHT_BRACKET
-        }[left_token_type]
+        right_token_type = LEFT_TO_RIGHT_MAP[left_token_type]
         self._advance([right_token_type])
 
         return Definition(identifier, expr)
 
     def _expression(self) -> Ast:
         token = self._advance()
+        if token is None:
+            raise ParseError("Expected token type but got none")
 
         if token.token_type == TokenType.INT_NUM:
             return Integer(token)
@@ -57,18 +55,35 @@ class Parser:
             return Real(token)
         elif token.token_type == TokenType.STRING:
             return String(token)
+        elif token.token_type in LEFT_TOKENS:
+            expected_end = LEFT_TO_RIGHT_MAP[token.token_type]
+            if self._quotation_level == 0:
+                return self._call(expected_end)
+            return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
-            return self._quote(token)
+            return self._quote(self._expected_end(token.lexeme[1]))
+        elif token.token_type in OPERATORS:
+            return BuiltInOperator(token)
 
         raise ParseError("Could not parse expression!")
 
-    def _quote(self, start):
+    def _call(self, end_token_type) -> Ast:
+        callee = self._expression()
+
+        args = []
+        while True:
+            next_token = self._lexer.peek()
+            if next_token is None:
+                raise ParseError("Unexpected end of quote expression")
+            if next_token.token_type == end_token_type:
+                self._advance()
+                break
+            args.append(self._expression())
+
+        return Call(callee, args)
+
+    def _quote(self, expected_end) -> Ast:
         self._quotation_level += 1
-        expected_end = {
-            "(": TokenType.RIGHT_PAREN,
-            "{": TokenType.RIGHT_BRACE,
-            "[": TokenType.RIGHT_BRACKET,
-        }[start.lexeme[1]]
         elements = []
 
         while True:
@@ -83,13 +98,21 @@ class Parser:
         self._quotation_level -= 1
         return List(elements)
 
+    @staticmethod
+    def _expected_end(lexeme):
+        return {
+            "(": TokenType.RIGHT_PAREN,
+            "{": TokenType.RIGHT_BRACE,
+            "[": TokenType.RIGHT_BRACKET,
+        }[lexeme]
+
     def _advance(self, expected_token_types = None) -> Token | None:
         token = self._lexer.advance()
         if token is None:
             if expected_token_types is None:
                 return None
             else:
-                raise ParseError(f"Expected token type but got none")
+                raise ParseError("Expected token type but got none")
         if expected_token_types is not None and token.token_type not in expected_token_types:
             raise ParseError(f"Unexpected token type {token.token_type}")
         return token

@@ -51,6 +51,18 @@ OPERATORS = [
     TokenType.PERCENT
 ]
 
+LEFT_TOKENS = [
+    TokenType.LEFT_PAREN,
+    TokenType.LEFT_BRACE,
+    TokenType.LEFT_BRACKET
+]
+
+LEFT_TO_RIGHT_MAP = {
+    TokenType.LEFT_PAREN: TokenType.RIGHT_PAREN,
+    TokenType.LEFT_BRACE: TokenType.RIGHT_BRACE,
+    TokenType.LEFT_BRACKET: TokenType.RIGHT_BRACKET
+}
+
 
 class Token:
     def __init__(self, token_type, line, column):

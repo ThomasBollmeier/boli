@@ -10,12 +10,18 @@ class Integer(Ast):
         Ast.__init__(self)
         self.int_tok = int_tok
 
+    def accept(self, visitor):
+        visitor.visit_int(self)
+
 
 class Real(Ast):
 
     def __init__(self, real_tok):
         Ast.__init__(self)
         self.real_tok = real_tok
+
+    def accept(self, visitor):
+        visitor.visit_real(self)
 
 
 class String(Ast):
@@ -24,12 +30,18 @@ class String(Ast):
         Ast.__init__(self)
         self.str_tok = str_tok
 
+    def accept(self, visitor):
+        visitor.visit_string(self)
+
 
 class Identifier(Ast):
 
     def __init__(self, ident_tok):
         Ast.__init__(self)
         self.ident_tok = ident_tok
+
+    def accept(self, visitor):
+        visitor.visit_ident(self)
 
 
 class List(Ast):
@@ -38,13 +50,19 @@ class List(Ast):
         Ast.__init__(self)
         self.elements = elements
 
+    def accept(self, visitor):
+        visitor.visit_list(self)
+
 
 class Definition(Ast):
 
-    def __init__(self, ident_tok, expr):
+    def __init__(self, ident, expr):
         Ast.__init__(self)
-        self.ident_tok = ident_tok
+        self.ident = ident
         self.expr = expr
+
+    def accept(self, visitor):
+        visitor.visit_def(self)
 
 
 class If(Ast):
@@ -55,6 +73,9 @@ class If(Ast):
         self.consequent = consequent
         self.alternate = alternate
 
+    def accept(self, visitor):
+        visitor.visit_if(self)
+
 
 class Call(Ast):
 
@@ -63,9 +84,25 @@ class Call(Ast):
         self.callee = callee
         self.args = args
 
+    def accept(self, visitor):
+        visitor.visit_call(self)
+
+
+class BuiltInOperator(Ast):
+
+    def __init__(self, operator_tok):
+        Ast.__init__(self)
+        self.op_tok = operator_tok
+
+    def accept(self, visitor):
+        visitor.visit_builtin_op(self)
+
 
 class Program(Ast):
 
     def __init__(self, children):
         Ast.__init__(self)
         self.children = children
+
+    def accept(self, visitor):
+        visitor.visit_program(self)
