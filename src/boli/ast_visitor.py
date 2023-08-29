@@ -15,6 +15,12 @@ class AstVisitor:
     def visit_ident(self, ident):
         pass
 
+    def visit_symbol(self, symbol):
+        pass
+
+    def visit_keyword(self, keyword):
+        pass
+
     def visit_list(self, lst):
         pass
 

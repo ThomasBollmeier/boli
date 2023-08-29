@@ -11,7 +11,9 @@ class TestParser:
         (def answer-to-everything (+ 41 1))
         (def ego "Thomas") ; <- that is me
         (def my-nested-list '(1 2 3 (4 5)))
-        (def male? #t)
+        (def sex (if (male? ego) 
+                     'male
+                     'female))
         """
 
         parser = Parser(Source(code))

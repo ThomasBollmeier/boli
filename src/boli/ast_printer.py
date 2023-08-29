@@ -1,5 +1,5 @@
 from boli.ast_visitor import AstVisitor
-from boli.tokens import OPERATORS, TOKENS_1
+from boli.tokens import TokenType, TOKENS_1
 
 
 class AstPrinter(AstVisitor):
@@ -23,6 +23,16 @@ class AstPrinter(AstVisitor):
     def visit_ident(self, ident):
         self._write(f"Identifier({ident.ident_tok.name})")
 
+    def visit_symbol(self, symbol):
+        self._write(f"Symbol({symbol.symbol_tok.name})")
+
+    def visit_keyword(self, keyword):
+        token_type = keyword.keyword_tok.token_type
+        if token_type == TokenType.DEF:
+            self._write("Def-Keyword")
+        elif token_type == TokenType.IF:
+            self._write("If-Keyword")
+
     def visit_list(self, lst):
         self._write("List:")
         self._indent += 1
@@ -38,7 +48,12 @@ class AstPrinter(AstVisitor):
         self._indent -= 1
 
     def visit_if(self, if_):
-        raise NotImplementedError()
+        self._write("IfExpression:")
+        self._indent += 1
+        if_.condition.accept(self)
+        if_.consequent.accept(self)
+        if_.alternate.accept(self)
+        self._indent -= 1
 
     def visit_call(self, call):
         self._write("Call:")

@@ -1,7 +1,7 @@
 from boli.buffered_stream import BufferedStream
 from boli.lexer import Lexer
 from boli.ast import *
-from boli.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP
+from boli.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP, KEYWORDS
 
 
 class ParseError(Exception):
@@ -22,12 +22,15 @@ class Parser:
             if token is None:
                 break
             if token.token_type in [TokenType.LEFT_PAREN, TokenType.LEFT_BRACE, TokenType.LEFT_BRACKET]:
-                allowed = [TokenType.DEF, TokenType.IDENT] + OPERATORS
-                next_token = self._advance(allowed)
+                next_token = self._advance()
+                if next_token is None:
+                    raise ParseError("Expected token but got none")
                 if next_token.token_type == TokenType.DEF:
                     child = self._definition(token.token_type)
+                elif next_token.token_type == TokenType.IF:
+                    ...
                 else:
-                    raise NotImplementedError()
+                    child = self._call(LEFT_TO_RIGHT_MAP[token.token_type])
             else:
                 raise ParseError(f"Token type {token.token_type} cannot be used on top level")
             if child is not None:
@@ -59,17 +62,35 @@ class Parser:
             return Bool(token)
         elif token.token_type == TokenType.IDENT:
             return Identifier(token)
+        elif token.token_type == TokenType.SYMBOL:
+            return Symbol(token)
         elif token.token_type in LEFT_TOKENS:
             expected_end = LEFT_TO_RIGHT_MAP[token.token_type]
             if self._quotation_level == 0:
+                next_token = self._lexer.peek()
+                if next_token is None:
+                    raise ParseError("Expected token but found none")
+                if next_token.token_type == TokenType.IF:
+                    return self._if(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
             return self._quote(self._expected_end(token.lexeme[1]))
         elif token.token_type in OPERATORS:
             return BuiltInOperator(token)
+        elif token.token_type in KEYWORDS.values():
+            return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _if(self, end_token_type) -> Ast:
+        self._advance()
+        condition = self._expression()
+        consequent = self._expression()
+        alternate = self._expression()
+        self._advance([end_token_type])
+
+        return If(condition, consequent, alternate)
 
     def _call(self, end_token_type) -> Ast:
         callee = self._expression()

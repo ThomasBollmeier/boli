@@ -22,7 +22,13 @@ class Lexer:
             elif ch.isdigit():
                 return self._scan_number(ch, line, column)
             elif ch == "'":  # quotation
-                return self._scan_quote(line, column)
+                next_ch = self._source.peek()
+                if next_ch is None:
+                    return UnknownToken(line, column, ch)
+                if next_ch == "(":
+                    return self._scan_quote(line, column)
+                self._advance_char()
+                return self._scan_identifier(next_ch, line, column, is_part_of_symbol=True)
             elif ch == ";":  # comment
                 self._skip_line_comment()
             else:
@@ -44,7 +50,7 @@ class Lexer:
         self._advance_char()
         return Quote(line, column, "'" + next_ch)
 
-    def _scan_identifier(self, start_ch, line, column):
+    def _scan_identifier(self, start_ch, line, column,is_part_of_symbol=False):
         forbidden_start = {"!", "?", ".", ","}
         if start_ch in forbidden_start:
             return UnknownToken(line, column, start_ch)
@@ -57,7 +63,10 @@ class Lexer:
         if name in ["#t", "#true", "#f", "#false"]:
             return BoolToken(line, column, name.startswith("#t"))
 
-        return IdentifierToken(line, column, name)
+        if not is_part_of_symbol:
+            return IdentifierToken(line, column, name)
+        else:
+            return Symbol(line, column, name)
 
     def _scan_while(self, predicate_fn):
         ret = ""

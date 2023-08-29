@@ -20,6 +20,12 @@ class TokenType:
     CARET = 18
     PERCENT = 19
     QUOTE = 20
+    SYMBOL = 21
+    EQ = 22
+    GT = 23
+    GE = 24
+    LT = 25
+    LE = 26
     UNKNOWN = -1
 
 
@@ -119,3 +125,10 @@ class Quote(Token):
     def __init__(self, line, column, lexeme):
         Token.__init__(self, TokenType.QUOTE, line, column)
         self.lexeme = lexeme
+
+
+class Symbol(Token):
+
+    def __init__(self, line, column, name):
+        Token.__init__(self, TokenType.SYMBOL, line, column)
+        self.name = name

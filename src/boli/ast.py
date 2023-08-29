@@ -54,6 +54,26 @@ class Identifier(Ast):
         visitor.visit_ident(self)
 
 
+class Symbol(Ast):
+
+    def __init__(self, symbol_tok):
+        Ast.__init__(self)
+        self.symbol_tok = symbol_tok
+
+    def accept(self, visitor):
+        visitor.visit_symbol(self)
+
+
+class Keyword(Ast):
+
+    def __init__(self, keyword_tok):
+        Ast.__init__(self)
+        self.keyword_tok = keyword_tok
+
+    def accept(self, visitor):
+        visitor.visit_keyword(self)
+
+
 class List(Ast):
 
     def __init__(self, elements):
