@@ -30,6 +30,9 @@ class AstVisitor:
     def visit_if(self, if_):
         pass
 
+    def visit_lambda(self, lambda_):
+        pass
+
     def visit_call(self, call):
         pass
 

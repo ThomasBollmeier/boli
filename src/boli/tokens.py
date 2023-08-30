@@ -13,19 +13,20 @@ class TokenType:
     STRING = 11
     DEF = 12
     IF = 13
-    PLUS = 14
-    MINUS = 15
-    ASTERISK = 16
-    SLASH = 17
-    CARET = 18
-    PERCENT = 19
-    QUOTE = 20
-    SYMBOL = 21
-    EQ = 22
-    GT = 23
-    GE = 24
-    LT = 25
-    LE = 26
+    LAMBDA = 14
+    PLUS = 15
+    MINUS = 16
+    ASTERISK = 17
+    SLASH = 18
+    CARET = 19
+    PERCENT = 20
+    QUOTE = 21
+    SYMBOL = 22
+    EQ = 23
+    GT = 24
+    GE = 25
+    LT = 26
+    LE = 27
     UNKNOWN = -1
 
 
@@ -47,6 +48,7 @@ TOKENS_1 = {
 KEYWORDS = {
     "def": TokenType.DEF,
     "if": TokenType.IF,
+    "lambda": TokenType.LAMBDA
 }
 
 OPERATORS = [

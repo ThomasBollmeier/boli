@@ -72,6 +72,8 @@ class Parser:
                     raise ParseError("Expected token but found none")
                 if next_token.token_type == TokenType.IF:
                     return self._if(expected_end)
+                if next_token.token_type == TokenType.LAMBDA:
+                    return self._lambda(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
@@ -82,6 +84,48 @@ class Parser:
             return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _lambda(self, end_lambda_token_type) -> Ast:
+        self._advance()
+        token = self._advance()
+        if token is None or token.token_type not in LEFT_TOKENS:
+            raise ParseError("Excepted left paren not found")
+        end_params_token_type = LEFT_TO_RIGHT_MAP[token.token_type]
+
+        params = []
+        var_param = None
+
+        while True:
+            next_token = self._lexer.peek()
+            if next_token is None:
+                raise ParseError("Expected token but found none")
+            if next_token.token_type == end_params_token_type:
+                self._advance()
+                break
+            if var_param is not None:  # the var_param must be the last in the parameter list
+                raise ParseError("Expected end of parameters")
+            ident_tok = self._lexer.peek()
+            if ident_tok is None or ident_tok.token_type != TokenType.IDENT:
+                raise ParseError("Excepted identifier not found")
+            ident = self._expression()
+            star_tok = self._lexer.peek()
+            if star_tok and star_tok.token_type == TokenType.ASTERISK:
+                self._advance()
+                var_param = ident
+            else:
+                params.append(ident)
+
+        body = [self._expression()]
+        while True:
+            next_token = self._lexer.peek()
+            if next_token is None:
+                raise ParseError("Expected token but found none")
+            if next_token.token_type == end_lambda_token_type:
+                self._advance()
+                break
+            body.append(self._expression())
+
+        return Lambda(body, params, var_param)
 
     def _if(self, end_token_type) -> Ast:
         self._advance()

@@ -32,6 +32,8 @@ class AstPrinter(AstVisitor):
             self._write("Def-Keyword")
         elif token_type == TokenType.IF:
             self._write("If-Keyword")
+        elif token_type == TokenType.LAMBDA:
+            self._write("Lambda-Keyword")
 
     def visit_list(self, lst):
         self._write("List:")
@@ -53,6 +55,23 @@ class AstPrinter(AstVisitor):
         if_.condition.accept(self)
         if_.consequent.accept(self)
         if_.alternate.accept(self)
+        self._indent -= 1
+
+    def visit_lambda(self, lambda_):
+        self._write("Lambda:")
+        self._indent += 1
+        self._write("Parameters:")
+        self._indent += 1
+        for param in lambda_.params:
+            self._write(param.ident_tok.name)
+        if lambda_.var_param:
+            self._write(f"{lambda_.var_param.ident_tok.name} (vararg)")
+        self._indent -= 1
+        self._write("Body:")
+        self._indent += 1
+        for expr in lambda_.body:
+            expr.accept(self)
+        self._indent -= 1
         self._indent -= 1
 
     def visit_call(self, call):

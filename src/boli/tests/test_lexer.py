@@ -71,6 +71,13 @@ class TestLexer:
         self._assert_token_type(tokens, 7, TokenType.RIGHT_PAREN)
         self._assert_token_type(tokens, 8, TokenType.RIGHT_PAREN)
 
+    def test_varargs(self):
+        code = """
+        (def my-func (lambda (arg1 args2*)))
+        """
+        tokens = self._create_lexer(code).fetch_all_tokens()
+        assert len(tokens) == 12
+
     @staticmethod
     def _assert_token_type(tokens, idx, expected):
         assert tokens[idx].token_type == expected

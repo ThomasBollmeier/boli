@@ -14,6 +14,7 @@ class TestParser:
         (def sex (if (male? ego) 
                      'male
                      'female))
+        (def my-sum (lambda (x*) (apply + x)))
         """
 
         parser = Parser(Source(code))

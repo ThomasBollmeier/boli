@@ -107,6 +107,18 @@ class If(Ast):
         visitor.visit_if(self)
 
 
+class Lambda(Ast):
+
+    def __init__(self, body, params, var_param=None):
+        Ast.__init__(self)
+        self.body = body
+        self.params = params
+        self.var_param = var_param
+
+    def accept(self, visitor):
+        visitor.visit_lambda(self)
+
+
 class Call(Ast):
 
     def __init__(self, callee, args):
