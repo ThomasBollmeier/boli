@@ -21,7 +21,7 @@ class Parser:
             token = self._lexer.advance()
             if token is None:
                 break
-            if token.token_type in [TokenType.LEFT_PAREN, TokenType.LEFT_BRACE, TokenType.LEFT_BRACKET]:
+            if token.token_type in LEFT_TOKENS:
                 next_token = self._advance()
                 if next_token is None:
                     raise ParseError("Expected token but got none")
@@ -39,11 +39,20 @@ class Parser:
         return Program(children)
 
     def _definition(self, left_token_type) -> Ast:
-        id_token = self._advance([TokenType.IDENT])
-        identifier = Identifier(id_token)
-        expr = self._expression()
+
         right_token_type = LEFT_TO_RIGHT_MAP[left_token_type]
-        self._advance([right_token_type])
+
+        token = self._advance([TokenType.IDENT] + LEFT_TOKENS)
+        if token.token_type == TokenType.IDENT:
+            identifier = Identifier(token)
+            expr = self._expression()
+            self._advance([right_token_type])
+        else:
+            right_type_func = LEFT_TO_RIGHT_MAP[token.token_type]
+            id_token = self._advance([TokenType.IDENT])
+            identifier = Identifier(id_token)
+            params, var_param, body = self._params_and_body(right_token_type, right_type_func)
+            expr = Lambda(body, params, var_param)
 
         return Definition(identifier, expr)
 
@@ -90,8 +99,13 @@ class Parser:
         token = self._advance()
         if token is None or token.token_type not in LEFT_TOKENS:
             raise ParseError("Excepted left paren not found")
-        end_params_token_type = LEFT_TO_RIGHT_MAP[token.token_type]
 
+        params, var_param, body = self._params_and_body(
+            end_lambda_token_type, LEFT_TO_RIGHT_MAP[token.token_type])
+
+        return Lambda(body, params, var_param)
+
+    def _params_and_body(self, end_lambda_token_type, end_params_token_type):
         params = []
         var_param = None
 
@@ -115,7 +129,7 @@ class Parser:
             else:
                 params.append(ident)
 
-        body = [self._expression()]
+        body = [self._body_element()]
         while True:
             next_token = self._lexer.peek()
             if next_token is None:
@@ -123,9 +137,22 @@ class Parser:
             if next_token.token_type == end_lambda_token_type:
                 self._advance()
                 break
-            body.append(self._expression())
+            body.append(self._body_element())
 
-        return Lambda(body, params, var_param)
+        return params, var_param, body
+
+    def _body_element(self):
+        next_tokens = self._lexer.peek_many(2)
+        if len(next_tokens) == 2:
+            if next_tokens[0].token_type in LEFT_TOKENS and next_tokens[1].token_type == TokenType.DEF:
+                left_token_type = next_tokens[0].token_type
+                self._advance()
+                self._advance()
+                return self._definition(left_token_type)
+            else:
+                return self._expression()
+        else:
+            return self._expression()
 
     def _if(self, end_token_type) -> Ast:
         self._advance()

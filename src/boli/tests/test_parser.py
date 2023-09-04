@@ -15,6 +15,10 @@ class TestParser:
                      'male
                      'female))
         (def my-sum (lambda (x*) (apply + x)))
+        (def (my-sum-2 x*)
+            (def local-fn +)
+            (def (my-add1 x) (+ x 1))
+            (apply local-fn x))
         """
 
         parser = Parser(Source(code))
