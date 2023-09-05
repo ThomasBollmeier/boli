@@ -84,6 +84,17 @@ class List(Ast):
         visitor.visit_list(self)
 
 
+class Struct(Ast):
+
+    def __init__(self, name_tok, fields):
+        Ast.__init__(self)
+        self.name_tok = name_tok
+        self.fields = fields
+
+    def accept(self, visitor):
+        visitor.visit_struct(self)
+
+
 class Definition(Ast):
 
     def __init__(self, ident, expr):

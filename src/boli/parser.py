@@ -22,13 +22,15 @@ class Parser:
             if token is None:
                 break
             if token.token_type in LEFT_TOKENS:
-                next_token = self._advance()
+                next_token = self._lexer.peek()
                 if next_token is None:
                     raise ParseError("Expected token but got none")
                 if next_token.token_type == TokenType.DEF:
-                    child = self._definition(token.token_type)
-                elif next_token.token_type == TokenType.IF:
-                    ...
+                    self._advance()
+                    child = self._definition(LEFT_TO_RIGHT_MAP[token.token_type])
+                elif next_token.token_type == TokenType.DEF_STRUCT:
+                    self._advance()
+                    child = self._struct(LEFT_TO_RIGHT_MAP[token.token_type])
                 else:
                     child = self._call(LEFT_TO_RIGHT_MAP[token.token_type])
             else:
@@ -38,9 +40,7 @@ class Parser:
 
         return Program(children)
 
-    def _definition(self, left_token_type) -> Ast:
-
-        right_token_type = LEFT_TO_RIGHT_MAP[left_token_type]
+    def _definition(self, right_token_type) -> Ast:
 
         token = self._advance([TokenType.IDENT] + LEFT_TOKENS)
         if token.token_type == TokenType.IDENT:
@@ -55,6 +55,23 @@ class Parser:
             expr = Lambda(body, params, var_param)
 
         return Definition(identifier, expr)
+
+    def _struct(self, right_token_type) -> Ast:
+        name_tok = self._advance([TokenType.IDENT])
+        left_token = self._advance(LEFT_TOKENS)
+        right_fields_token_type = LEFT_TO_RIGHT_MAP[left_token.token_type]
+        fields = []
+        while True:
+            next_token = self._advance([TokenType.IDENT, right_fields_token_type])
+            if next_token is None:
+                raise ParseError("Expected token but found none")
+            if next_token.token_type == right_fields_token_type:
+                break
+            fields.append(Identifier(next_token))
+
+        self._advance([right_token_type])
+
+        return Struct(name_tok, fields)
 
     def _expression(self) -> Ast:
         token = self._advance()
@@ -148,7 +165,8 @@ class Parser:
                 left_token_type = next_tokens[0].token_type
                 self._advance()
                 self._advance()
-                return self._definition(left_token_type)
+                right_token_type = LEFT_TO_RIGHT_MAP[left_token_type]
+                return self._definition(right_token_type)
             else:
                 return self._expression()
         else:

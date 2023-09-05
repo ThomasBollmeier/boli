@@ -34,6 +34,15 @@ class AstPrinter(AstVisitor):
             self._write("If-Keyword")
         elif token_type == TokenType.LAMBDA:
             self._write("Lambda-Keyword")
+        elif token_type == TokenType.DEF_STRUCT:
+            self._write("Def-Struct-Keyword")
+
+    def visit_struct(self, struct):
+        self._write(f"StructDefinition({struct.name_tok.name}):")
+        self._indent += 1
+        for field in struct.fields:
+            field.accept(self)
+        self._indent -= 1
 
     def visit_list(self, lst):
         self._write("List:")

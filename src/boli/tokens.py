@@ -27,6 +27,7 @@ class TokenType:
     GE = 25
     LT = 26
     LE = 27
+    DEF_STRUCT = 28
     UNKNOWN = -1
 
 
@@ -47,6 +48,7 @@ TOKENS_1 = {
 
 KEYWORDS = {
     "def": TokenType.DEF,
+    "def-struct": TokenType.DEF_STRUCT,
     "if": TokenType.IF,
     "lambda": TokenType.LAMBDA
 }

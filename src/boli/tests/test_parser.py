@@ -27,3 +27,15 @@ class TestParser:
         assert ast is not None
 
         ast.accept(AstPrinter())
+
+    def test_struct(self):
+
+        code = """
+        (def-struct Person (name first-name sex))
+        """
+
+        ast = Parser(Source(code)).program()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())

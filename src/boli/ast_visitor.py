@@ -21,6 +21,9 @@ class AstVisitor:
     def visit_keyword(self, keyword):
         pass
 
+    def visit_struct(self, struct):
+        pass
+
     def visit_list(self, lst):
         pass
 
