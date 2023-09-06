@@ -2,6 +2,7 @@ from boli.tokens import *
 from boli.buffered_stream import BufferedStream
 import os
 
+
 class Lexer:
 
     def __init__(self, source):
@@ -57,16 +58,19 @@ class Lexer:
 
         name = start_ch + self._scan_while(self._is_valid_ident_char)
 
+        if is_part_of_symbol:
+            return Symbol(line, column, name)
+
         if name in KEYWORDS:
             return Token(KEYWORDS[name], line, column)
 
         if name in ["#t", "#true", "#f", "#false"]:
             return BoolToken(line, column, name.startswith("#t"))
 
-        if not is_part_of_symbol:
-            return IdentifierToken(line, column, name)
-        else:
-            return Symbol(line, column, name)
+        if name == "nil":
+            return NilToken(line, column)
+
+        return IdentifierToken(line, column, name)
 
     def _scan_while(self, predicate_fn):
         ret = ""

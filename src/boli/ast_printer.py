@@ -20,6 +20,9 @@ class AstPrinter(AstVisitor):
     def visit_bool(self, boolean):
         self._write(f"Bool({boolean.bool_tok.bool_val})")
 
+    def visit_nil(self, nil):
+        self._write("nil")
+
     def visit_ident(self, ident):
         self._write(f"Identifier({ident.ident_tok.name})")
 

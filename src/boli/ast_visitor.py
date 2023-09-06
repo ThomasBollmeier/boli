@@ -12,6 +12,9 @@ class AstVisitor:
     def visit_bool(self, boolean):
         pass
 
+    def visit_nil(self, nil):
+        pass
+
     def visit_ident(self, ident):
         pass
 

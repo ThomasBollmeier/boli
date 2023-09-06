@@ -8,6 +8,7 @@ class TestParser:
     def test_program(self):
 
         code = """
+        (def nothing nil)
         (def answer-to-everything (+ 41 1))
         (def ego "Thomas") ; <- that is me
         (def my-nested-list '(1 2 3 (4 5)))

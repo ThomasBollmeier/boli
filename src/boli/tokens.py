@@ -28,6 +28,7 @@ class TokenType:
     LT = 26
     LE = 27
     DEF_STRUCT = 28
+    NIL = 29
     UNKNOWN = -1
 
 
@@ -45,6 +46,8 @@ TOKENS_1 = {
     "^": TokenType.CARET,
     "%": TokenType.PERCENT
 }
+
+TOKEN_TYPE_TO_CHAR_1 = dict([(v, k) for k, v in TOKENS_1.items()])
 
 KEYWORDS = {
     "def": TokenType.DEF,
@@ -108,6 +111,12 @@ class BoolToken(Token):
     def __init__(self, line, column, bool_val):
         Token.__init__(self, TokenType.BOOL, line, column)
         self.bool_val = bool_val
+
+
+class NilToken(Token):
+
+    def __init__(self, line, column):
+        Token.__init__(self, TokenType.NIL, line, column)
 
 
 class IdentifierToken(Token):

@@ -9,11 +9,11 @@ class TestLexer:
     def test_lexer(self):
         code = """
         ( ( ) {} [] "\\"Test\\" 1\\2" 42 is-this-an-identifier? + - * / 
-        def if) ^ % 'a-symbol
+        def if) ^ % 'a-symbol nil
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
 
-        assert len(tokens) == 20
+        assert len(tokens) == 21
         self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 1, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 2, TokenType.RIGHT_PAREN)
@@ -38,6 +38,7 @@ class TestLexer:
         self._assert_token_type(tokens,18, TokenType.PERCENT)
         self._assert_token_type(tokens, 19, TokenType.SYMBOL)
         assert tokens[19].name == 'a-symbol'
+        self._assert_token_type(tokens, 20, TokenType.NIL)
 
     @pytest.mark.parametrize("num_str, expected_num_val", [
         ("42", 42),
