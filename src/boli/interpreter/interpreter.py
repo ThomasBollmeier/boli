@@ -1,10 +1,9 @@
-from boli.source import Source
-from boli.parser import Parser
-from boli.ast import *
-from boli.ast_visitor import AstVisitor
-# from boli.interpreter.values import *
+from boli.frontend.source import Source
+from boli.frontend.parser import Parser
+from boli.frontend.ast import *
+from boli.frontend.ast_visitor import AstVisitor
 from boli.interpreter.builtin import *
-from boli.tokens import *
+from boli.frontend.tokens import *
 
 
 class Environment:
@@ -32,6 +31,13 @@ class Interpreter(AstVisitor):
         self._global.insert("-", sub)
         self._global.insert("*", mult)
         self._global.insert("/", div)
+        self._global.insert("^", exp)
+        self._global.insert("%", mod)
+        self._global.insert("=", eq)
+        self._global.insert(">", gt)
+        self._global.insert(">=", ge)
+        self._global.insert("<", lt)
+        self._global.insert("<=", le)
 
         self._cur_env = self._global
 
@@ -49,13 +55,13 @@ class Interpreter(AstVisitor):
         return Integer(integer.int_tok.value)
 
     def visit_real(self, real):
-        pass
+        return Real(real.real_tok.value)
 
     def visit_string(self, string):
         pass
 
     def visit_bool(self, boolean):
-        pass
+        return Bool(boolean.bool_tok.bool_val)
 
     def visit_nil(self, nil):
         pass
@@ -88,9 +94,9 @@ class Interpreter(AstVisitor):
         callee = call.callee
 
         if isinstance(callee, BuiltInOperator):
-            op = TOKEN_TYPE_TO_CHAR_1[callee.op_tok.token_type]
+            op = OP_TYPE_TO_STR[callee.op_tok.token_type]
             func = self._cur_env.lookup(op)
-            if not isinstance(func, Func):
+            if not isinstance(func, BuiltInFunc):
                 raise Exception("Expected function")
             arg_vals = [arg.accept(self) for arg in call.args]
             return func(arg_vals)

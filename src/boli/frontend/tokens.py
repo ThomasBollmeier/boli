@@ -44,10 +44,9 @@ TOKENS_1 = {
     "*": TokenType.ASTERISK,
     "/": TokenType.SLASH,
     "^": TokenType.CARET,
-    "%": TokenType.PERCENT
+    "%": TokenType.PERCENT,
+    "=": TokenType.EQ
 }
-
-TOKEN_TYPE_TO_CHAR_1 = dict([(v, k) for k, v in TOKENS_1.items()])
 
 KEYWORDS = {
     "def": TokenType.DEF,
@@ -56,14 +55,21 @@ KEYWORDS = {
     "lambda": TokenType.LAMBDA
 }
 
-OPERATORS = [
-    TokenType.PLUS,
-    TokenType.MINUS,
-    TokenType.ASTERISK,
-    TokenType.SLASH,
-    TokenType.CARET,
-    TokenType.PERCENT
-]
+OP_TYPE_TO_STR = {
+    TokenType.PLUS: "+",
+    TokenType.MINUS: "-",
+    TokenType.ASTERISK: "*",
+    TokenType.SLASH: "/",
+    TokenType.CARET: "^",
+    TokenType.PERCENT: "%",
+    TokenType.EQ: "=",
+    TokenType.GT: ">",
+    TokenType.GE: ">=",
+    TokenType.LT: "<",
+    TokenType.LE: "<="
+}
+
+OPERATORS = list(OP_TYPE_TO_STR.keys())
 
 LEFT_TOKENS = [
     TokenType.LEFT_PAREN,

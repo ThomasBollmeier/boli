@@ -1,5 +1,5 @@
-from boli.ast_visitor import AstVisitor
-from boli.tokens import TokenType, TOKENS_1
+from boli.frontend.ast_visitor import AstVisitor
+from boli.frontend.tokens import TokenType, TOKENS_1
 
 
 class AstPrinter(AstVisitor):

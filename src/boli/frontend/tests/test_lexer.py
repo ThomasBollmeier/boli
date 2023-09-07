@@ -1,6 +1,6 @@
-from boli.lexer import Lexer
-from boli.source import Source
-from boli.tokens import TokenType, IntNumToken, RealNumToken
+from boli.frontend.lexer import Lexer
+from boli.frontend.source import Source
+from boli.frontend.tokens import TokenType, IntNumToken, RealNumToken
 import pytest
 
 
@@ -9,11 +9,11 @@ class TestLexer:
     def test_lexer(self):
         code = """
         ( ( ) {} [] "\\"Test\\" 1\\2" 42 is-this-an-identifier? + - * / 
-        def if) ^ % 'a-symbol nil
+        def if) ^ % 'a-symbol nil = > >= < <=
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
 
-        assert len(tokens) == 21
+        assert len(tokens) == 26
         self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 1, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 2, TokenType.RIGHT_PAREN)
@@ -39,6 +39,11 @@ class TestLexer:
         self._assert_token_type(tokens, 19, TokenType.SYMBOL)
         assert tokens[19].name == 'a-symbol'
         self._assert_token_type(tokens, 20, TokenType.NIL)
+        self._assert_token_type(tokens, 21, TokenType.EQ)
+        self._assert_token_type(tokens, 22, TokenType.GT)
+        self._assert_token_type(tokens, 23, TokenType.GE)
+        self._assert_token_type(tokens, 24, TokenType.LT)
+        self._assert_token_type(tokens, 25, TokenType.LE)
 
     @pytest.mark.parametrize("num_str, expected_num_val", [
         ("42", 42),

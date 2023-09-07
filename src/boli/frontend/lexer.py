@@ -1,5 +1,5 @@
-from boli.tokens import *
-from boli.buffered_stream import BufferedStream
+from boli.frontend.tokens import *
+from boli.frontend.buffered_stream import BufferedStream
 import os
 
 
@@ -16,6 +16,20 @@ class Lexer:
             ch, line, column = self._skip_whitespace()
             if ch is None:
                 return None
+            elif ch == ">":
+                next_ch = self._source.peek()
+                if next_ch is not None and next_ch == "=":
+                    self._advance_char()
+                    return Token(TokenType.GE, line, column)
+                else:
+                    return Token(TokenType.GT, line, column)
+            elif ch == "<":
+                next_ch = self._source.peek()
+                if next_ch is not None and next_ch == "=":
+                    self._advance_char()
+                    return Token(TokenType.LE, line, column)
+                else:
+                    return Token(TokenType.LT, line, column)
             elif ch in TOKENS_1:
                 return Token(TOKENS_1[ch], line, column)
             elif ch == '"':

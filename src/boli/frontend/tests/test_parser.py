@@ -1,6 +1,6 @@
-from boli.parser import Parser
-from boli.source import Source
-from boli.ast_printer import AstPrinter
+from boli.frontend.parser import Parser
+from boli.frontend.source import Source
+from boli.frontend.ast_printer import AstPrinter
 
 
 class TestParser:

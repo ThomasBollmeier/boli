@@ -1,7 +1,7 @@
-from boli.buffered_stream import BufferedStream
-from boli.lexer import Lexer
-from boli.ast import *
-from boli.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP, KEYWORDS
+from boli.frontend.buffered_stream import BufferedStream
+from boli.frontend.lexer import Lexer
+from boli.frontend.ast import *
+from boli.frontend.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP, KEYWORDS
 
 
 class ParseError(Exception):
