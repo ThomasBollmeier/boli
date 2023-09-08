@@ -141,8 +141,8 @@ class Parser:
             if ident_tok is None or ident_tok.token_type != TokenType.IDENT:
                 raise ParseError("Excepted identifier not found")
             ident = self.expression()
-            star_tok = self._lexer.peek()
-            if star_tok and star_tok.token_type == TokenType.ASTERISK:
+            dots_tok = self._lexer.peek()
+            if dots_tok and dots_tok.token_type == TokenType.DOT_3:
                 self._advance()
                 var_param = ident
             else:
@@ -193,6 +193,12 @@ class Parser:
                 raise ParseError("Unexpected end of quote expression")
             if next_token.token_type == end_token_type:
                 self._advance()
+                break
+            if next_token.token_type == TokenType.DOT_3:  # <-- vararg encountered
+                self._advance()
+                ident_tok = self._advance([TokenType.IDENT])
+                args.append(VarArg(ident_tok))
+                self._advance([end_token_type])
                 break
             args.append(self.expression())
 

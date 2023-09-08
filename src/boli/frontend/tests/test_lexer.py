@@ -9,11 +9,11 @@ class TestLexer:
     def test_lexer(self):
         code = """
         ( ( ) {} [] "\\"Test\\" 1\\2" 42 is-this-an-identifier? + - * / 
-        def if) ^ % 'a-symbol nil = > >= < <=
+        def if) ^ % 'a-symbol nil = > >= < <= ...
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
 
-        assert len(tokens) == 26
+        assert len(tokens) == 27
         self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 1, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 2, TokenType.RIGHT_PAREN)
@@ -44,6 +44,7 @@ class TestLexer:
         self._assert_token_type(tokens, 23, TokenType.GE)
         self._assert_token_type(tokens, 24, TokenType.LT)
         self._assert_token_type(tokens, 25, TokenType.LE)
+        self._assert_token_type(tokens, 26, TokenType.DOT_3)
 
     @pytest.mark.parametrize("num_str, expected_num_val", [
         ("42", 42),
@@ -79,7 +80,7 @@ class TestLexer:
 
     def test_varargs(self):
         code = """
-        (def my-func (lambda (arg1 args2*)))
+        (def my-func (lambda (arg1 args2...)))
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
         assert len(tokens) == 12

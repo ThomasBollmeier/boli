@@ -42,6 +42,9 @@ class AstVisitor:
     def visit_call(self, call):
         pass
 
+    def visit_vararg(self, vararg):
+        pass
+
     def visit_builtin_op(self, builtin_op):
         pass
 

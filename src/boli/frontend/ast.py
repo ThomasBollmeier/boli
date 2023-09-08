@@ -154,6 +154,16 @@ class Call(Ast):
         return visitor.visit_call(self)
 
 
+class VarArg(Ast):
+
+    def __init__(self, ident_tok):
+        Ast.__init__(self)
+        self.ident_tok = ident_tok
+
+    def accept(self, visitor):
+        return visitor.visit_vararg(self)
+
+
 class BuiltInOperator(Ast):
 
     def __init__(self, operator_tok):

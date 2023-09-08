@@ -15,11 +15,9 @@ class TestParser:
         (def sex (if (male? ego) 
                      'male
                      'female))
-        (def my-sum (lambda (x*) (apply + x)))
-        (def (my-sum-2 x*)
-            (def local-fn +)
-            (def (my-add1 x) (+ x 1))
-            (apply local-fn x))
+        (def my-add1 (lambda (x) (+ x 1)))
+        (def (my-sum numbers...)
+            (+ ...numbers))
         """
 
         parser = Parser(Source(code))
@@ -33,6 +31,19 @@ class TestParser:
 
         code = """
         (def-struct Person (name first-name sex))
+        """
+
+        ast = Parser(Source(code)).program()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())
+
+    def test_vararg(self):
+
+        code = """
+        (def (sum args...)
+            (+ ...args))
         """
 
         ast = Parser(Source(code)).program()

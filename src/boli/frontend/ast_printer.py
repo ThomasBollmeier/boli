@@ -77,7 +77,7 @@ class AstPrinter(AstVisitor):
         for param in lambda_.params:
             self._write(param.ident_tok.name)
         if lambda_.var_param:
-            self._write(f"{lambda_.var_param.ident_tok.name} (vararg)")
+            self._write(f"{lambda_.var_param.ident_tok.name} (VarParam)")
         self._indent -= 1
         self._write("Body:")
         self._indent += 1
@@ -95,6 +95,9 @@ class AstPrinter(AstVisitor):
             arg.accept(self)
         self._indent -= 1
         self._indent -= 1
+
+    def visit_vararg(self, vararg):
+        self._write(f"VarArg({vararg.ident_tok.name})")
 
     def visit_builtin_op(self, builtin_op):
         operator = ""

@@ -29,6 +29,7 @@ class TokenType:
     LE = 27
     DEF_STRUCT = 28
     NIL = 29
+    DOT_3 = 30
     UNKNOWN = -1
 
 
