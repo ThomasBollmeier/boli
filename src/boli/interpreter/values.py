@@ -45,11 +45,52 @@ class Bool(Value):
         return "#t" if self.value else "#f"
 
 
-class BuiltInFunc(Value):
+class String(Value):
+
+    def __init__(self, str_val):
+        Value.__init__(self)
+        self.value = str_val
+
+    def __str__(self):
+        return self.value
+
+
+class Callable:
+
+    def __init__(self, with_lazy_arg_eval=False):
+        self.with_lazy_arg_eval = with_lazy_arg_eval
+
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError()
+
+
+class BuiltInFunc(Value, Callable):
 
     def __init__(self, func):
         Value.__init__(self)
+        Callable.__init__(self)
         self._func = func
 
     def __call__(self, args):
         return self._func(args)
+
+
+class BuiltInFuncLazy(Value, Callable):
+
+    def __init__(self, func):
+        Value.__init__(self)
+        Callable.__init__(self, with_lazy_arg_eval=True)
+        self._func = func
+
+    def __call__(self, interpreter, args):
+        return self._func(interpreter, args)
+
+
+class Lambda(Value, Callable):
+
+    def __init__(self):
+        Value.__init__(self)
+        Callable.__init__(self)
+
+    def __call__(self, args):
+        raise NotImplementedError()

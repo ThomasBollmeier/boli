@@ -18,8 +18,8 @@ class TestInterpreter:
         value = self._eval_code("(+ 41 1,0)", Real)
         assert str(value) == "42,0"
 
-        value = self._eval_code("(^ 7 2)", Integer)
-        assert str(value) == "49"
+        value = self._eval_code("(^ 2 2 3)", Integer)
+        assert str(value) == "256"
 
         value = self._eval_code("(^ 7,0 2)", Real)
         assert str(value) == "49,0"
@@ -41,6 +41,37 @@ class TestInterpreter:
 
         value = self._eval_code("(<= 42 41)", Bool)
         assert str(value) == "#f"
+
+        value = self._eval_code("(and (= 2 (+ 1 1)) 42)", Integer)
+        assert str(value) == "42"
+
+        value = self._eval_code("(and (= 1 2) i-will-not-be-evaluated)", Bool)
+        assert str(value) == "#f"
+
+        value = self._eval_code("(or 42 i-will-not-be-evaluated)", Integer)
+        assert str(value) == "42"
+
+        value = self._eval_code("(not 42)", Bool)
+        assert str(value) == "#f"
+
+        value = self._eval_code("(not nil)", Bool)
+        assert str(value) == "#t"
+
+        code = """
+        (if 42
+            "the answer to everything"
+            i-will-not-be-evaluated)
+        """
+        value = self._eval_code(code, String)
+        assert str(value) == "the answer to everything"
+
+        code = """
+        (if (not 42)
+            i-will-not-be-evaluated
+            "the answer to everything")
+        """
+        value = self._eval_code(code, String)
+        assert str(value) == "the answer to everything"
 
     @staticmethod
     def _eval_code(code, expected_type):
