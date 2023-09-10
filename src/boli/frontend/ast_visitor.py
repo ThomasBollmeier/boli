@@ -33,6 +33,9 @@ class AstVisitor:
     def visit_def(self, definition):
         pass
 
+    def visit_block(self, block):
+        pass
+
     def visit_if(self, if_):
         pass
 

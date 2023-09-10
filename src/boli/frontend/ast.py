@@ -119,6 +119,16 @@ class Definition(Ast):
         return visitor.visit_def(self)
 
 
+class Block(Ast):
+
+    def __init__(self, expressions):
+        Ast.__init__(self)
+        self.expressions = expressions
+
+    def accept(self, visitor):
+        visitor.visit_block(self)
+
+
 class If(Ast):
 
     def __init__(self, condition, consequent, alternate):

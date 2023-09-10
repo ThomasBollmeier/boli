@@ -7,12 +7,12 @@ class Environment:
         self._parent = parent
         self._values = {}
 
-    def lookup(self, name) -> Value:
+    def lookup(self, name):
         if name in self._values:
             return self._values[name]
         elif self._parent:
             return self._parent.lookup(name)
-        return Nil()
+        return None
 
     def insert(self, name, value):
         self._values[name] = value

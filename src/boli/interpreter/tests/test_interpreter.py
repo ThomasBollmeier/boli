@@ -73,6 +73,33 @@ class TestInterpreter:
         value = self._eval_code(code, String)
         assert str(value) == "the answer to everything"
 
+    def test_function_call(self):
+
+        code = """
+        (def (my-add fst snd further-numbers...)
+            (+ fst snd ...further-numbers))
+        (def numbers '(1 2 3 4))
+        (my-add ...numbers)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "10"
+
+    def test_recursive_call(self):
+
+        code = """
+        (def (fac n)
+            (if (= n 0)
+                1
+                (* n (fac (- n 1)))))
+        (fac 5)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "120"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

@@ -55,6 +55,16 @@ class String(Value):
         return self.value
 
 
+class List(Value):
+
+    def __init__(self, items):
+        Value.__init__(self)
+        self.items = items
+
+    def __str__(self):
+        ret = "'(" + " ".join([str(item) for item in self.items]) + ")"
+
+
 class Callable:
 
     def __init__(self, with_lazy_arg_eval=False):
@@ -88,9 +98,27 @@ class BuiltInFuncLazy(Value, Callable):
 
 class Lambda(Value, Callable):
 
-    def __init__(self):
+    def __init__(self, lambda_, interpreter):
         Value.__init__(self)
         Callable.__init__(self)
+        self._lambda = lambda_
+        self._interpreter = interpreter
 
     def __call__(self, args):
-        raise NotImplementedError()
+        func_interpreter = self._interpreter.new_child()
+        func_env = func_interpreter.get_environment()
+        # map parameters to arguments
+        param_idx = 0
+        for param in self._lambda.params:
+            param_name = param.ident_tok.name
+            func_env.insert(param_name, args[param_idx])
+            param_idx += 1
+        if self._lambda.var_param is not None:
+            var_param_name = self._lambda.var_param.ident_tok.name
+            func_env.insert(var_param_name, List(args[param_idx:]))
+
+        ret = Nil()
+        for elem in self._lambda.body:
+            ret = elem.accept(func_interpreter)
+
+        return ret

@@ -102,6 +102,8 @@ class Parser:
                     return self._if(expected_end)
                 if next_token.token_type == TokenType.LAMBDA:
                     return self._lambda(expected_end)
+                if next_token.token_type == TokenType.BLOCK:
+                    return self._block(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
@@ -112,6 +114,18 @@ class Parser:
             return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _block(self, end_token_type) -> Ast:
+        self._advance([TokenType.BLOCK])
+        expressions = []
+        while True:
+            next_token = self._lexer.peek()
+            if next_token and next_token.token_type == end_token_type:
+                self._advance()
+                break
+            expressions.append(self.expression())
+
+        return Block(expressions)
 
     def _lambda(self, end_lambda_token_type) -> Ast:
         self._advance()

@@ -51,3 +51,19 @@ class TestParser:
         assert ast is not None
 
         ast.accept(AstPrinter())
+
+    def test_block(self):
+
+        code = """
+        (if (= 42 (+ 41 1))
+            (block
+                (do-first-thing "Foo")
+                (do-something-else "Bar"))
+            nil)
+        """
+
+        ast = Parser(Source(code)).expression()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())

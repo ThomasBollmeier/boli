@@ -4,13 +4,19 @@ from boli.frontend.ast import *
 from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import *
 from boli.interpreter.builtin import *
-from boli.interpreter.environment import create_global_environment
+from boli.interpreter.environment import create_global_environment, Environment
 
 
 class Interpreter(AstVisitor):
 
-    def __init__(self):
-        self._cur_env = create_global_environment()
+    def __init__(self, env=None):
+        self._cur_env = create_global_environment() if env is None else env
+
+    def new_child(self):
+        return Interpreter(Environment(self._cur_env))
+
+    def get_environment(self):
+        return self._cur_env
 
     def eval_program(self, code) -> Value:
         parser = Parser(Source(code))
@@ -38,7 +44,11 @@ class Interpreter(AstVisitor):
         return Nil()
 
     def visit_ident(self, ident):
-        pass
+        name = ident.ident_tok.name
+        value = self._cur_env.lookup(name)
+        if value is None:
+            raise Exception(f"Identifier '{name}' is unknown")
+        return value
 
     def visit_symbol(self, symbol):
         pass
@@ -50,9 +60,15 @@ class Interpreter(AstVisitor):
         pass
 
     def visit_list(self, lst):
-        pass
+        return List([elem.accept(self) for elem in lst.elements])
 
     def visit_def(self, definition):
+        name = definition.ident.ident_tok.name
+        expr_value = definition.expr.accept(self)
+        self._cur_env.insert(name, expr_value)
+        return Nil()
+
+    def visit_block(self, block):
         pass
 
     def visit_if(self, if_expr):
@@ -64,16 +80,31 @@ class Interpreter(AstVisitor):
                                 if_expr.alternate])
 
     def visit_lambda(self, lambda_):
-        pass
+        return Lambda(lambda_, self)
 
     def visit_call(self, call):
         callee = call.callee
         callable_ = self._get_callable(callee)
         if not callable_.with_lazy_arg_eval:
-            arg_vals = [arg.accept(self) for arg in call.args]
+            arg_vals = []
+            for arg in call.args:
+                arg_val = arg.accept(self)
+                if isinstance(arg_val, list):
+                    arg_vals.extend(arg_val)
+                else:
+                    arg_vals.append(arg_val)
             return callable_(arg_vals)
         else:
             return callable_(self, call.args)
+
+    def visit_vararg(self, vararg):
+        vararg_name = vararg.ident_tok.name
+        vararg_value = self._cur_env.lookup(vararg_name)
+        if vararg_value is None:
+            raise Exception(f"Identifier '{vararg_name}' is unknown")
+        if not isinstance(vararg_value, List):
+            raise Exception("Vararg must be of list type")
+        return [it for it in vararg_value.items]
 
     def visit_builtin_op(self, builtin_op):
         pass

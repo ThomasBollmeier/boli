@@ -61,6 +61,13 @@ class AstPrinter(AstVisitor):
         definition.expr.accept(self)
         self._indent -= 1
 
+    def visit_block(self, block):
+        self._write("Block:")
+        self._indent += 1
+        for expr in block.expressions:
+            expr.accept(self)
+        self._indent -= 1
+
     def visit_if(self, if_):
         self._write("IfExpression:")
         self._indent += 1
