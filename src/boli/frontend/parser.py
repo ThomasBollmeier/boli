@@ -13,6 +13,7 @@ class Parser:
     def __init__(self, source):
         self._lexer = BufferedStream(Lexer(source))
         self._quotation_level = 0
+        self._funcdef_stack = []
 
     def program(self) -> Program:
         children = []
@@ -54,7 +55,26 @@ class Parser:
             params, var_param, body = self._params_and_body(right_token_type, right_type_func)
             expr = Lambda(body, params, var_param)
 
+            self._funcdef_stack.append(id_token.name)
+            self._find_tail_calls(body[-1])
+            self._funcdef_stack.pop()
+
         return Definition(identifier, expr)
+
+    def _find_tail_calls(self, ast):
+        if isinstance(ast, Call) and isinstance(ast.callee, Identifier):
+            name = ast.callee.ident_tok.name
+            if name == self._funcdef_stack[-1]:
+                ast.is_tail_call = True
+                return
+
+        if isinstance(ast, If):
+            self._find_tail_calls(ast.consequent)
+            self._find_tail_calls(ast.alternate)
+            return
+
+        if isinstance(ast, Block) and ast.expressions:
+            self._find_tail_calls(ast.expressions[-1])
 
     def _struct(self, right_token_type) -> Ast:
         name_tok = self._advance([TokenType.IDENT])

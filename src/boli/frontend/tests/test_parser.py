@@ -67,3 +67,22 @@ class TestParser:
         assert ast is not None
 
         ast.accept(AstPrinter())
+
+    def test_tail_call(self):
+
+        code = """
+        (def (fac n)
+            (def (fac-helper n acc)
+                (if (= n 0)
+                    acc
+                    (block
+                        (writeln acc)
+                        (fac-helper (- n 1) (* n acc)))))
+            (fac-helper n 1))
+        """
+
+        ast = Parser(Source(code)).program()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())

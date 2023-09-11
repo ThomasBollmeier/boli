@@ -94,7 +94,10 @@ class AstPrinter(AstVisitor):
         self._indent -= 1
 
     def visit_call(self, call):
-        self._write("Call:")
+        if not call.is_tail_call:
+            self._write("Call:")
+        else:
+            self._write("TailCall:")
         self._indent += 1
         call.callee.accept(self)
         self._indent += 1

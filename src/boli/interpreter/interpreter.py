@@ -1,10 +1,10 @@
 from boli.frontend.source import Source
 from boli.frontend.parser import Parser
-from boli.frontend.ast import *
+from boli.frontend.ast import BuiltInOperator, Identifier
 from boli.frontend.ast_visitor import AstVisitor
-from boli.frontend.tokens import *
-from boli.interpreter.builtin import *
+from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
+from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List
 
 
 class Interpreter(AstVisitor):

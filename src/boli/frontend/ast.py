@@ -159,6 +159,7 @@ class Call(Ast):
         Ast.__init__(self)
         self.callee = callee
         self.args = args
+        self.is_tail_call = False
 
     def accept(self, visitor):
         return visitor.visit_call(self)
