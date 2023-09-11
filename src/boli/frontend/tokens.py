@@ -28,6 +28,9 @@ class TokenType:
     LT = 26
     LE = 27
     DEF_STRUCT = 28
+    NIL = 29
+    DOT_3 = 30
+    BLOCK = 31
     UNKNOWN = -1
 
 
@@ -43,24 +46,33 @@ TOKENS_1 = {
     "*": TokenType.ASTERISK,
     "/": TokenType.SLASH,
     "^": TokenType.CARET,
-    "%": TokenType.PERCENT
+    "%": TokenType.PERCENT,
+    "=": TokenType.EQ
 }
 
 KEYWORDS = {
     "def": TokenType.DEF,
     "def-struct": TokenType.DEF_STRUCT,
     "if": TokenType.IF,
-    "lambda": TokenType.LAMBDA
+    "lambda": TokenType.LAMBDA,
+    "block": TokenType.BLOCK
 }
 
-OPERATORS = [
-    TokenType.PLUS,
-    TokenType.MINUS,
-    TokenType.ASTERISK,
-    TokenType.SLASH,
-    TokenType.CARET,
-    TokenType.PERCENT
-]
+OP_TYPE_TO_STR = {
+    TokenType.PLUS: "+",
+    TokenType.MINUS: "-",
+    TokenType.ASTERISK: "*",
+    TokenType.SLASH: "/",
+    TokenType.CARET: "^",
+    TokenType.PERCENT: "%",
+    TokenType.EQ: "=",
+    TokenType.GT: ">",
+    TokenType.GE: ">=",
+    TokenType.LT: "<",
+    TokenType.LE: "<="
+}
+
+OPERATORS = list(OP_TYPE_TO_STR.keys())
 
 LEFT_TOKENS = [
     TokenType.LEFT_PAREN,
@@ -108,6 +120,12 @@ class BoolToken(Token):
     def __init__(self, line, column, bool_val):
         Token.__init__(self, TokenType.BOOL, line, column)
         self.bool_val = bool_val
+
+
+class NilToken(Token):
+
+    def __init__(self, line, column):
+        Token.__init__(self, TokenType.NIL, line, column)
 
 
 class IdentifierToken(Token):

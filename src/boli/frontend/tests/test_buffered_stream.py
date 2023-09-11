@@ -1,5 +1,5 @@
-from boli.source import Source
-from boli.buffered_stream import BufferedStream
+from boli.frontend.source import Source
+from boli.frontend.buffered_stream import BufferedStream
 
 
 def test_peek():

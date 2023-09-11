@@ -3,6 +3,9 @@ class Ast:
     def __init__(self):
         pass
 
+    def accept(self, visitor):
+        return None
+
 
 class Integer(Ast):
 
@@ -11,7 +14,7 @@ class Integer(Ast):
         self.int_tok = int_tok
 
     def accept(self, visitor):
-        visitor.visit_int(self)
+        return visitor.visit_int(self)
 
 
 class Real(Ast):
@@ -21,7 +24,7 @@ class Real(Ast):
         self.real_tok = real_tok
 
     def accept(self, visitor):
-        visitor.visit_real(self)
+        return visitor.visit_real(self)
 
 
 class String(Ast):
@@ -31,7 +34,7 @@ class String(Ast):
         self.str_tok = str_tok
 
     def accept(self, visitor):
-        visitor.visit_string(self)
+        return visitor.visit_string(self)
 
 
 class Bool(Ast):
@@ -41,7 +44,17 @@ class Bool(Ast):
         self.bool_tok = bool_tok
 
     def accept(self, visitor):
-        visitor.visit_bool(self)
+        return visitor.visit_bool(self)
+
+
+class Nil(Ast):
+
+    def __init__(self, nil_tok):
+        Ast.__init__(self)
+        self.nil_tok = nil_tok
+
+    def accept(self, visitor):
+        return visitor.visit_nil(self)
 
 
 class Identifier(Ast):
@@ -51,7 +64,7 @@ class Identifier(Ast):
         self.ident_tok = ident_tok
 
     def accept(self, visitor):
-        visitor.visit_ident(self)
+        return visitor.visit_ident(self)
 
 
 class Symbol(Ast):
@@ -61,7 +74,7 @@ class Symbol(Ast):
         self.symbol_tok = symbol_tok
 
     def accept(self, visitor):
-        visitor.visit_symbol(self)
+        return visitor.visit_symbol(self)
 
 
 class Keyword(Ast):
@@ -71,7 +84,7 @@ class Keyword(Ast):
         self.keyword_tok = keyword_tok
 
     def accept(self, visitor):
-        visitor.visit_keyword(self)
+        return visitor.visit_keyword(self)
 
 
 class List(Ast):
@@ -81,7 +94,7 @@ class List(Ast):
         self.elements = elements
 
     def accept(self, visitor):
-        visitor.visit_list(self)
+        return visitor.visit_list(self)
 
 
 class Struct(Ast):
@@ -92,7 +105,7 @@ class Struct(Ast):
         self.fields = fields
 
     def accept(self, visitor):
-        visitor.visit_struct(self)
+        return visitor.visit_struct(self)
 
 
 class Definition(Ast):
@@ -103,7 +116,17 @@ class Definition(Ast):
         self.expr = expr
 
     def accept(self, visitor):
-        visitor.visit_def(self)
+        return visitor.visit_def(self)
+
+
+class Block(Ast):
+
+    def __init__(self, expressions):
+        Ast.__init__(self)
+        self.expressions = expressions
+
+    def accept(self, visitor):
+        visitor.visit_block(self)
 
 
 class If(Ast):
@@ -115,7 +138,7 @@ class If(Ast):
         self.alternate = alternate
 
     def accept(self, visitor):
-        visitor.visit_if(self)
+        return visitor.visit_if(self)
 
 
 class Lambda(Ast):
@@ -127,7 +150,7 @@ class Lambda(Ast):
         self.var_param = var_param
 
     def accept(self, visitor):
-        visitor.visit_lambda(self)
+        return visitor.visit_lambda(self)
 
 
 class Call(Ast):
@@ -138,7 +161,17 @@ class Call(Ast):
         self.args = args
 
     def accept(self, visitor):
-        visitor.visit_call(self)
+        return visitor.visit_call(self)
+
+
+class VarArg(Ast):
+
+    def __init__(self, ident_tok):
+        Ast.__init__(self)
+        self.ident_tok = ident_tok
+
+    def accept(self, visitor):
+        return visitor.visit_vararg(self)
 
 
 class BuiltInOperator(Ast):
@@ -148,7 +181,7 @@ class BuiltInOperator(Ast):
         self.op_tok = operator_tok
 
     def accept(self, visitor):
-        visitor.visit_builtin_op(self)
+        return visitor.visit_builtin_op(self)
 
 
 class Program(Ast):
@@ -158,4 +191,4 @@ class Program(Ast):
         self.children = children
 
     def accept(self, visitor):
-        visitor.visit_program(self)
+        return visitor.visit_program(self)

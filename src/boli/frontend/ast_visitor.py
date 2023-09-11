@@ -12,6 +12,9 @@ class AstVisitor:
     def visit_bool(self, boolean):
         pass
 
+    def visit_nil(self, nil):
+        pass
+
     def visit_ident(self, ident):
         pass
 
@@ -30,6 +33,9 @@ class AstVisitor:
     def visit_def(self, definition):
         pass
 
+    def visit_block(self, block):
+        pass
+
     def visit_if(self, if_):
         pass
 
@@ -37,6 +43,9 @@ class AstVisitor:
         pass
 
     def visit_call(self, call):
+        pass
+
+    def visit_vararg(self, vararg):
         pass
 
     def visit_builtin_op(self, builtin_op):

@@ -1,6 +1,7 @@
-from boli.tokens import *
-from boli.buffered_stream import BufferedStream
+from boli.frontend.tokens import *
+from boli.frontend.buffered_stream import BufferedStream
 import os
+
 
 class Lexer:
 
@@ -13,15 +14,43 @@ class Lexer:
     def advance(self):
         while True:
             ch, line, column = self._skip_whitespace()
+
             if ch is None:
                 return None
-            elif ch in TOKENS_1:
+
+            if ch == ">":
+                next_ch = self._source.peek()
+                if next_ch is not None and next_ch == "=":
+                    self._advance_char()
+                    return Token(TokenType.GE, line, column)
+                else:
+                    return Token(TokenType.GT, line, column)
+
+            if ch == "<":
+                next_ch = self._source.peek()
+                if next_ch is not None and next_ch == "=":
+                    self._advance_char()
+                    return Token(TokenType.LE, line, column)
+                else:
+                    return Token(TokenType.LT, line, column)
+
+            if ch in TOKENS_1:
                 return Token(TOKENS_1[ch], line, column)
-            elif ch == '"':
+
+            if ch == '"':
                 return self._scan_string(line, column)
-            elif ch.isdigit():
+
+            if ch == ".":
+                next_chars = "".join(self._source.peek_many(2))
+                if next_chars == "..":
+                    self._advance_char()
+                    self._advance_char()
+                    return Token(TokenType.DOT_3, line, column)
+
+            if ch.isdigit():
                 return self._scan_number(ch, line, column)
-            elif ch == "'":  # quotation
+
+            if ch == "'":  # quotation
                 next_ch = self._source.peek()
                 if next_ch is None:
                     return UnknownToken(line, column, ch)
@@ -29,10 +58,12 @@ class Lexer:
                     return self._scan_quote(line, column)
                 self._advance_char()
                 return self._scan_identifier(next_ch, line, column, is_part_of_symbol=True)
-            elif ch == ";":  # comment
+
+            if ch == ";":  # comment
                 self._skip_line_comment()
-            else:
-                return self._scan_identifier(ch, line, column)
+                continue
+
+            return self._scan_identifier(ch, line, column)
 
     def fetch_all_tokens(self):
         tokens = []
@@ -57,16 +88,19 @@ class Lexer:
 
         name = start_ch + self._scan_while(self._is_valid_ident_char)
 
+        if is_part_of_symbol:
+            return Symbol(line, column, name)
+
         if name in KEYWORDS:
             return Token(KEYWORDS[name], line, column)
 
         if name in ["#t", "#true", "#f", "#false"]:
             return BoolToken(line, column, name.startswith("#t"))
 
-        if not is_part_of_symbol:
-            return IdentifierToken(line, column, name)
-        else:
-            return Symbol(line, column, name)
+        if name == "nil":
+            return NilToken(line, column)
+
+        return IdentifierToken(line, column, name)
 
     def _scan_while(self, predicate_fn):
         ret = ""
@@ -81,7 +115,7 @@ class Lexer:
     def _is_valid_ident_char(self, ch):
         if ch in self._whitespace:
             return False
-        if ch in set(list('"(){}[]/*')):
+        if ch in set(list('"(){}[]/.')):
             return False
         return True
 

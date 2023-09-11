@@ -1,7 +1,7 @@
-from boli.buffered_stream import BufferedStream
-from boli.lexer import Lexer
-from boli.ast import *
-from boli.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP, KEYWORDS
+from boli.frontend.buffered_stream import BufferedStream
+from boli.frontend.lexer import Lexer
+from boli.frontend.ast import *
+from boli.frontend.tokens import TokenType, Token, OPERATORS, LEFT_TOKENS, LEFT_TO_RIGHT_MAP, KEYWORDS
 
 
 class ParseError(Exception):
@@ -45,7 +45,7 @@ class Parser:
         token = self._advance([TokenType.IDENT] + LEFT_TOKENS)
         if token.token_type == TokenType.IDENT:
             identifier = Identifier(token)
-            expr = self._expression()
+            expr = self.expression()
             self._advance([right_token_type])
         else:
             right_type_func = LEFT_TO_RIGHT_MAP[token.token_type]
@@ -73,7 +73,7 @@ class Parser:
 
         return Struct(name_tok, fields)
 
-    def _expression(self) -> Ast:
+    def expression(self) -> Ast:
         token = self._advance()
         if token is None:
             raise ParseError("Expected token type but got none")
@@ -86,6 +86,8 @@ class Parser:
             return String(token)
         elif token.token_type == TokenType.BOOL:
             return Bool(token)
+        elif token.token_type == TokenType.NIL:
+            return Nil(token)
         elif token.token_type == TokenType.IDENT:
             return Identifier(token)
         elif token.token_type == TokenType.SYMBOL:
@@ -100,6 +102,8 @@ class Parser:
                     return self._if(expected_end)
                 if next_token.token_type == TokenType.LAMBDA:
                     return self._lambda(expected_end)
+                if next_token.token_type == TokenType.BLOCK:
+                    return self._block(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
@@ -110,6 +114,18 @@ class Parser:
             return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _block(self, end_token_type) -> Ast:
+        self._advance([TokenType.BLOCK])
+        expressions = []
+        while True:
+            next_token = self._lexer.peek()
+            if next_token and next_token.token_type == end_token_type:
+                self._advance()
+                break
+            expressions.append(self.expression())
+
+        return Block(expressions)
 
     def _lambda(self, end_lambda_token_type) -> Ast:
         self._advance()
@@ -138,9 +154,9 @@ class Parser:
             ident_tok = self._lexer.peek()
             if ident_tok is None or ident_tok.token_type != TokenType.IDENT:
                 raise ParseError("Excepted identifier not found")
-            ident = self._expression()
-            star_tok = self._lexer.peek()
-            if star_tok and star_tok.token_type == TokenType.ASTERISK:
+            ident = self.expression()
+            dots_tok = self._lexer.peek()
+            if dots_tok and dots_tok.token_type == TokenType.DOT_3:
                 self._advance()
                 var_param = ident
             else:
@@ -168,21 +184,21 @@ class Parser:
                 right_token_type = LEFT_TO_RIGHT_MAP[left_token_type]
                 return self._definition(right_token_type)
             else:
-                return self._expression()
+                return self.expression()
         else:
-            return self._expression()
+            return self.expression()
 
     def _if(self, end_token_type) -> Ast:
         self._advance()
-        condition = self._expression()
-        consequent = self._expression()
-        alternate = self._expression()
+        condition = self.expression()
+        consequent = self.expression()
+        alternate = self.expression()
         self._advance([end_token_type])
 
         return If(condition, consequent, alternate)
 
     def _call(self, end_token_type) -> Ast:
-        callee = self._expression()
+        callee = self.expression()
 
         args = []
         while True:
@@ -192,7 +208,13 @@ class Parser:
             if next_token.token_type == end_token_type:
                 self._advance()
                 break
-            args.append(self._expression())
+            if next_token.token_type == TokenType.DOT_3:  # <-- vararg encountered
+                self._advance()
+                ident_tok = self._advance([TokenType.IDENT])
+                args.append(VarArg(ident_tok))
+                self._advance([end_token_type])
+                break
+            args.append(self.expression())
 
         return Call(callee, args)
 
@@ -207,7 +229,7 @@ class Parser:
             if next_token.token_type == expected_end:
                 self._advance()
                 break
-            elements.append(self._expression())
+            elements.append(self.expression())
 
         self._quotation_level -= 1
         return List(elements)

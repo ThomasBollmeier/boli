@@ -1,5 +1,5 @@
-from boli.ast_visitor import AstVisitor
-from boli.tokens import TokenType, TOKENS_1
+from boli.frontend.ast_visitor import AstVisitor
+from boli.frontend.tokens import TokenType, TOKENS_1
 
 
 class AstPrinter(AstVisitor):
@@ -19,6 +19,9 @@ class AstPrinter(AstVisitor):
 
     def visit_bool(self, boolean):
         self._write(f"Bool({boolean.bool_tok.bool_val})")
+
+    def visit_nil(self, nil):
+        self._write("nil")
 
     def visit_ident(self, ident):
         self._write(f"Identifier({ident.ident_tok.name})")
@@ -58,6 +61,13 @@ class AstPrinter(AstVisitor):
         definition.expr.accept(self)
         self._indent -= 1
 
+    def visit_block(self, block):
+        self._write("Block:")
+        self._indent += 1
+        for expr in block.expressions:
+            expr.accept(self)
+        self._indent -= 1
+
     def visit_if(self, if_):
         self._write("IfExpression:")
         self._indent += 1
@@ -74,7 +84,7 @@ class AstPrinter(AstVisitor):
         for param in lambda_.params:
             self._write(param.ident_tok.name)
         if lambda_.var_param:
-            self._write(f"{lambda_.var_param.ident_tok.name} (vararg)")
+            self._write(f"{lambda_.var_param.ident_tok.name} (VarParam)")
         self._indent -= 1
         self._write("Body:")
         self._indent += 1
@@ -92,6 +102,9 @@ class AstPrinter(AstVisitor):
             arg.accept(self)
         self._indent -= 1
         self._indent -= 1
+
+    def visit_vararg(self, vararg):
+        self._write(f"VarArg({vararg.ident_tok.name})")
 
     def visit_builtin_op(self, builtin_op):
         operator = ""
