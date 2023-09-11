@@ -86,6 +86,19 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "10"
 
+    def test_function_call_w_varargs(self):
+
+        code = """
+        (def (my-add numbers)
+            (+ ...numbers))
+        (def numbers '(1 2 3 4))
+        (my-add numbers)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "10"
+
     def test_recursive_call(self):
 
         code = """
