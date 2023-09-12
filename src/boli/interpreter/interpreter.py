@@ -4,7 +4,7 @@ from boli.frontend.ast import BuiltInOperator, Identifier
 from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
-from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List
+from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall
 
 
 class Interpreter(AstVisitor):
@@ -69,7 +69,10 @@ class Interpreter(AstVisitor):
         return Nil()
 
     def visit_block(self, block):
-        pass
+        ret = Nil()
+        for expr in block.expressions:
+            ret = expr.accept(self)
+        return ret
 
     def visit_if(self, if_expr):
         callable_ = self._cur_env.lookup("if")
@@ -83,19 +86,25 @@ class Interpreter(AstVisitor):
         return Lambda(lambda_, self)
 
     def visit_call(self, call):
+        if call.is_tail_call:
+            #  Tail call optimization:
+            raise TailCall(self._arg_values(call.args))
         callee = call.callee
         callable_ = self._get_callable(callee)
         if not callable_.with_lazy_arg_eval:
-            arg_vals = []
-            for arg in call.args:
-                arg_val = arg.accept(self)
-                if isinstance(arg_val, list):
-                    arg_vals.extend(arg_val)
-                else:
-                    arg_vals.append(arg_val)
-            return callable_(arg_vals)
+            return callable_(self._arg_values(call.args))
         else:
             return callable_(self, call.args)
+
+    def _arg_values(self, args):
+        arg_vals = []
+        for arg in args:
+            arg_val = arg.accept(self)
+            if isinstance(arg_val, list):
+                arg_vals.extend(arg_val)
+            else:
+                arg_vals.append(arg_val)
+        return arg_vals
 
     def visit_vararg(self, vararg):
         vararg_name = vararg.ident_tok.name

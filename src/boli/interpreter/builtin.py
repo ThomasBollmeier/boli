@@ -124,6 +124,19 @@ def if_(interpreter, args):
         return alternate.accept(interpreter)
 
 
+@BuiltInFunc
+def write(args):
+    for arg in args:
+        print(str(arg), end=" ")
+
+
+@BuiltInFunc
+def writeln(args):
+    for arg in args:
+        print(str(arg), end=" ")
+    print()
+
+
 def _is_truthy(value):
     if isinstance(value, Bool):
         return value.value

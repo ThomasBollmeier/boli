@@ -105,6 +105,20 @@ class Lambda(Value, Callable):
         self._interpreter = interpreter
 
     def __call__(self, args):
+        arguments = args
+        while True:
+            func_interpreter = self._init_func_interpreter(arguments)
+            ret = Nil()
+            try:
+                for elem in self._lambda.body:
+                    ret = elem.accept(func_interpreter)
+                break
+            except TailCall as tail_call:
+                arguments = tail_call.args
+
+        return ret
+
+    def _init_func_interpreter(self, args):
         func_interpreter = self._interpreter.new_child()
         func_env = func_interpreter.get_environment()
         # map parameters to arguments
@@ -117,8 +131,10 @@ class Lambda(Value, Callable):
             var_param_name = self._lambda.var_param.ident_tok.name
             func_env.insert(var_param_name, List(args[param_idx:]))
 
-        ret = Nil()
-        for elem in self._lambda.body:
-            ret = elem.accept(func_interpreter)
+        return func_interpreter
 
-        return ret
+
+class TailCall(Exception):
+
+    def __init__(self, args):
+        self.args = args

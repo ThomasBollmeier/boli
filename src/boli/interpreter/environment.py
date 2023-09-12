@@ -36,5 +36,7 @@ def create_global_environment() -> Environment:
     ret.insert("or", or_)
     ret.insert("not", not_)
     ret.insert("if", if_)
+    ret.insert("write", write)
+    ret.insert("writeln", writeln)
 
     return ret

@@ -126,7 +126,7 @@ class Block(Ast):
         self.expressions = expressions
 
     def accept(self, visitor):
-        visitor.visit_block(self)
+        return visitor.visit_block(self)
 
 
 class If(Ast):

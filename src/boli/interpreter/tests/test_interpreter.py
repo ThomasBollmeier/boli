@@ -113,6 +113,23 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "120"
 
+    def test_tail_call(self):
+
+        code = """
+        (def (fac n)
+            (def (fac-helper n acc)
+                (if (= n 0)
+                    acc
+                    (fac-helper (- n 1) (* n acc))))
+            (fac-helper n 1))
+            
+        (fac 5)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "120"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()
