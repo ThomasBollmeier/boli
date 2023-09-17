@@ -130,6 +130,37 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "120"
 
+    def test_closure(self):
+
+        code = """
+        (def (make-counter)
+            (def cnt 1)
+            (lambda ()
+                (def ret cnt)
+                (set! cnt (+ cnt 1))
+                ret))
+        (def count (make-counter))
+        (def count2 (make-counter))
+        (count)
+        (count)
+        (= (- (count) 2) (count2))
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Bool)
+        assert str(value) == "#t"
+
+        code = """
+        (def (make-adder n)
+            (lambda (m)
+                (+ m n)))
+        (def add-3 (make-adder 3))
+        (add-3 39)    
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "42"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

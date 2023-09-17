@@ -1,4 +1,5 @@
 from boli.interpreter.values import *
+from boli.frontend.ast import Identifier
 
 
 @BuiltInFunc
@@ -128,6 +129,7 @@ def if_(interpreter, args):
 def write(args):
     for arg in args:
         print(str(arg), end=" ")
+    return Nil()
 
 
 @BuiltInFunc
@@ -135,6 +137,23 @@ def writeln(args):
     for arg in args:
         print(str(arg), end=" ")
     print()
+    return Nil()
+
+
+@BuiltInFuncLazy
+def set_bang(interpreter, args):
+    if len(args) != 2:
+        raise Exception("function set! expects two arguments")
+    if not isinstance(args[0], Identifier):
+        raise Exception("set!: first argument must be identifier")
+    name = args[0].ident_tok.name
+    env = interpreter.get_environment()
+    def_env = env.lookup_defining_env(name)
+    if def_env is None:
+        raise Exception(f"identifier {name} is unknown")
+    value = args[1].accept(interpreter)
+    def_env.insert(name, value)
+    return Nil()
 
 
 def _is_truthy(value):

@@ -14,6 +14,14 @@ class Environment:
             return self._parent.lookup(name)
         return None
 
+    def lookup_defining_env(self, name):
+        if name in self._values:
+            return self
+        elif self._parent:
+            return self._parent.lookup_defining_env(name)
+        else:
+            return None
+
     def insert(self, name, value):
         self._values[name] = value
 
@@ -38,5 +46,6 @@ def create_global_environment() -> Environment:
     ret.insert("if", if_)
     ret.insert("write", write)
     ret.insert("writeln", writeln)
+    ret.insert("set!", set_bang)
 
     return ret
