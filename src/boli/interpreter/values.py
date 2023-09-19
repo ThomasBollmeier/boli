@@ -62,7 +62,7 @@ class List(Value):
         self.items = items
 
     def __str__(self):
-        ret = "'(" + " ".join([str(item) for item in self.items]) + ")"
+        return "'(" + " ".join([str(item) for item in self.items]) + ")"
 
 
 class Callable:

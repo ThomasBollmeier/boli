@@ -1,4 +1,5 @@
 from boli.interpreter.builtin import *
+from boli.interpreter.list_functions import *
 
 
 class Environment:
@@ -47,5 +48,7 @@ def create_global_environment() -> Environment:
     ret.insert("write", write)
     ret.insert("writeln", writeln)
     ret.insert("set!", set_bang)
+    ret.insert("map", map_)
+    ret.insert("filter", filter_)
 
     return ret
