@@ -116,7 +116,8 @@ class Interpreter(AstVisitor):
         return [it for it in vararg_value.items]
 
     def visit_builtin_op(self, builtin_op):
-        pass
+        op = OP_TYPE_TO_STR[builtin_op.op_tok.token_type]
+        return self._cur_env.lookup(op)
 
     def visit_program(self, program):
         ret = Nil()

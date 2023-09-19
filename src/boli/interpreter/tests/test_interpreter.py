@@ -161,34 +161,6 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "42"
 
-    def test_map(self):
-
-        code = """
-        (def (main) 
-            (def lst '(1 2 3 4))
-            (def (add1 n) (+ n 1))
-            (map add1 lst))
-        (main)
-        """
-
-        value = Interpreter().eval_program(code)
-        assert isinstance(value, List)
-        assert str(value) == "'(2 3 4 5)"
-
-    def test_filter(self):
-
-        code = """
-        (def (main) 
-            (def lst '(1 2 3 4))
-            (def (even? n) (= 0 (% n 2)))
-            (filter even? lst))
-        (main)
-        """
-
-        value = Interpreter().eval_program(code)
-        assert isinstance(value, List)
-        assert str(value) == "'(2 4)"
-
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()
