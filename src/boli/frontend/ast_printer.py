@@ -76,6 +76,20 @@ class AstPrinter(AstVisitor):
         if_.alternate.accept(self)
         self._indent -= 1
 
+    def visit_cond(self, cond):
+        self._write("CondExpression:")
+        self._indent += 1
+        for branch in cond.branches:
+            branch.accept(self)
+        self._indent -= 1
+
+    def visit_cond_branch(self, cond_branch):
+        self._write("CondBranch:")
+        self._indent += 1
+        cond_branch.condition.accept(self)
+        cond_branch.expression.accept(self)
+        self._indent -= 1
+
     def visit_lambda(self, lambda_):
         self._write("Lambda:")
         self._indent += 1

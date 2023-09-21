@@ -39,6 +39,12 @@ class AstVisitor:
     def visit_if(self, if_):
         pass
 
+    def visit_cond(self, cond):
+        pass
+
+    def visit_cond_branch(self, cond_branch):
+        pass
+
     def visit_lambda(self, lambda_):
         pass
 

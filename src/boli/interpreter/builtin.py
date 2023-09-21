@@ -92,7 +92,7 @@ def and_(interpreter, args):
     ret = Bool(True)
     for arg in args:
         arg_val = arg.accept(interpreter)
-        if _is_truthy(arg_val):
+        if is_truthy(arg_val):
             ret = arg_val
         else:
             return Bool(False)
@@ -103,7 +103,7 @@ def and_(interpreter, args):
 def or_(interpreter, args):
     for arg in args:
         arg_val = arg.accept(interpreter)
-        if _is_truthy(arg_val):
+        if is_truthy(arg_val):
             return arg_val
     return Bool(False) and args or Bool(True)
 
@@ -112,14 +112,14 @@ def or_(interpreter, args):
 def not_(args):
     if len(args) != 1:
         raise Exception("not expects a single argument")
-    return Bool(not _is_truthy(args[0]))
+    return Bool(not is_truthy(args[0]))
 
 
 @BuiltInFuncLazy
 def if_(interpreter, args):
     condition, consequent, alternate = args
     cond_val = condition.accept(interpreter)
-    if _is_truthy(cond_val):
+    if is_truthy(cond_val):
         return consequent.accept(interpreter)
     else:
         return alternate.accept(interpreter)
@@ -156,7 +156,7 @@ def set_bang(interpreter, args):
     return Nil()
 
 
-def _is_truthy(value):
+def is_truthy(value):
     if isinstance(value, Bool):
         return value.value
     if isinstance(value, Nil):

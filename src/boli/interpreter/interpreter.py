@@ -5,6 +5,7 @@ from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
 from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall
+from boli.interpreter.builtin import is_truthy
 
 
 class Interpreter(AstVisitor):
@@ -70,8 +71,9 @@ class Interpreter(AstVisitor):
 
     def visit_block(self, block):
         ret = Nil()
+        block_interpreter = self.new_child()
         for expr in block.expressions:
-            ret = expr.accept(self)
+            ret = expr.accept(block_interpreter)
         return ret
 
     def visit_if(self, if_expr):
@@ -81,6 +83,15 @@ class Interpreter(AstVisitor):
         return callable_(self, [if_expr.condition,
                                 if_expr.consequent,
                                 if_expr.alternate])
+
+    def visit_cond(self, cond):
+        for branch in cond.branches:
+            if is_truthy(branch.condition.accept(self)):
+                return branch.expression.accept(self)
+        return Nil()
+
+    def visit_cond_branch(self, cond_branch):
+        pass
 
     def visit_lambda(self, lambda_):
         return Lambda(lambda_, self)

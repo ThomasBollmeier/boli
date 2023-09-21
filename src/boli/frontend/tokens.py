@@ -31,6 +31,7 @@ class TokenType:
     NIL = 29
     DOT_3 = 30
     BLOCK = 31
+    COND = 32
     UNKNOWN = -1
 
 
@@ -55,7 +56,8 @@ KEYWORDS = {
     "def-struct": TokenType.DEF_STRUCT,
     "if": TokenType.IF,
     "lambda": TokenType.LAMBDA,
-    "block": TokenType.BLOCK
+    "block": TokenType.BLOCK,
+    "cond": TokenType.COND
 }
 
 OP_TYPE_TO_STR = {

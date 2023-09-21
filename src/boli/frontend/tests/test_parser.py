@@ -86,3 +86,19 @@ class TestParser:
         assert ast is not None
 
         ast.accept(AstPrinter())
+
+    def test_cond_expression(self):
+
+        code = """
+        (block
+            (def answer 42)
+            (cond
+                [(= answer 42) "the answer to everything"]
+                [#t i-will-not-be-evaluated]))
+        """
+
+        ast = Parser(Source(code)).expression()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())

@@ -73,6 +73,11 @@ class Parser:
             self._find_tail_calls(ast.alternate)
             return
 
+        if isinstance(ast, Cond):
+            for branch in ast.branches:
+                self._find_tail_calls(branch.expression)
+            return
+
         if isinstance(ast, Block) and ast.expressions:
             self._find_tail_calls(ast.expressions[-1])
 
@@ -124,6 +129,8 @@ class Parser:
                     return self._lambda(expected_end)
                 if next_token.token_type == TokenType.BLOCK:
                     return self._block(expected_end)
+                if next_token.token_type == TokenType.COND:
+                    return self._cond(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
@@ -135,15 +142,46 @@ class Parser:
 
         raise ParseError("Could not parse expression!")
 
+    def _cond(self, end_token_type) -> Ast:
+        self._advance([TokenType.COND])
+        branches = []
+        while True:
+            branch_start = self._advance(LEFT_TOKENS)
+            branches.append(self._cond_branch(LEFT_TO_RIGHT_MAP[branch_start.token_type]))
+            next_token = self._lexer.peek()
+            if next_token is not None and next_token.token_type == end_token_type:
+                self._advance()
+                break
+        return Cond(branches)
+
+    def _cond_branch(self, end_token_type) -> Ast:
+        condition = self.expression()
+        expression = self.expression()
+        self._advance([end_token_type])
+        return CondBranch(condition, expression)
+
     def _block(self, end_token_type) -> Ast:
         self._advance([TokenType.BLOCK])
         expressions = []
         while True:
-            next_token = self._lexer.peek()
+            next_tokens = self._lexer.peek_many(2)
+            try:
+                next_token = next_tokens[0]
+            except IndexError:
+                raise Exception("Expected token but found none")
+            try:
+                next_next_token = next_tokens[1]
+            except IndexError:
+                next_next_token = None
             if next_token and next_token.token_type == end_token_type:
                 self._advance()
                 break
-            expressions.append(self.expression())
+            if next_next_token and next_next_token.token_type == TokenType.DEF:
+                self._advance()
+                self._advance()
+                expressions.append(self._definition(LEFT_TO_RIGHT_MAP[next_token.token_type]))
+            else:
+                expressions.append(self.expression())
 
         return Block(expressions)
 

@@ -141,6 +141,27 @@ class If(Ast):
         return visitor.visit_if(self)
 
 
+class Cond(Ast):
+
+    def __init__(self, branches):
+        Ast.__init__(self)
+        self.branches = branches
+
+    def accept(self, visitor):
+        return visitor.visit_cond(self)
+
+
+class CondBranch(Ast):
+
+    def __init__(self, condition, expression):
+        Ast.__init__(self)
+        self.condition = condition
+        self.expression = expression
+
+    def accept(self, visitor):
+        visitor.visit_cond_branch(self)
+
+
 class Lambda(Ast):
 
     def __init__(self, body, params, var_param=None):

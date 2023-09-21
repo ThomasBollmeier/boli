@@ -50,6 +50,8 @@ def create_global_environment() -> Environment:
     ret.insert("set!", set_bang)
     ret.insert("head", head)
     ret.insert("tail", tail)
+    ret.insert("take", take)
+    ret.insert("drop", drop)
     ret.insert("list-ref", list_ref)
     ret.insert("list-set!", list_set_bang)
     ret.insert("concat", concat)

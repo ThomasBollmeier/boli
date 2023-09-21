@@ -73,6 +73,16 @@ class TestInterpreter:
         value = self._eval_code(code, String)
         assert str(value) == "the answer to everything"
 
+    def test_cond_expr(self):
+
+        code = """
+        (block
+            (def answer 42)
+            (cond
+                [(= answer 42) "the answer to everythind"]
+                [#t i-will-not-be-evaluated]))
+        """
+
     def test_function_call(self):
 
         code = """
@@ -130,6 +140,28 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "120"
 
+    def test_tail_call_2(self):
+        code = """
+        (def (reverse lst)
+            (def (reverse-helper lst acc)
+                (if (empty? lst)
+                    acc
+                    (reverse-helper (tail lst) (cons (head lst) acc))))
+            (reverse-helper lst '()))
+
+        (def (fibo n) ; calculate the first n Fibonacci numbers
+            (def (fibo-helper a b n acc)
+                (cond
+                    [(= n 0) (reverse acc)] 
+                    [#t (fibo-helper b (+ a b) (- n 1) (cons a acc))]))
+            (fibo-helper 1 1 n '()))
+        (fibo 10)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, List)
+        assert str(value) == "'(1 1 2 3 5 8 13 21 34 55)"
+
     def test_closure(self):
 
         code = """
@@ -160,6 +192,42 @@ class TestInterpreter:
         value = Interpreter().eval_program(code)
         assert isinstance(value, Integer)
         assert str(value) == "42"
+
+    def test_scope(self):
+
+        code = """
+        (def (main)
+            (def answer 42)
+            (def (my-func)
+                (def answer 43)
+                (writeln answer))
+            (writeln)
+            (my-func)
+            (block
+                (def answer 44)
+                (writeln answer))
+            (writeln answer)
+            answer)
+        (main)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "42"
+
+    def test_cond_expression(self):
+        code = """
+        (def (main)
+            (block
+                (def answer 42)
+                (cond
+                    [(= answer 42) "the answer to everything"]
+                    [#t i-will-not-be-evaluated])))
+        (main)
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, String)
+        assert str(value) == "the answer to everything"
 
     @staticmethod
     def _eval_code(code, expected_type):

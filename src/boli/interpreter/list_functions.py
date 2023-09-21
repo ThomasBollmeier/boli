@@ -12,6 +12,16 @@ def tail(args):
 
 
 @BuiltInFunc
+def take(args):
+    return List(args[1].items[:args[0].value])
+
+
+@BuiltInFunc
+def drop(args):
+    return List(args[1].items[args[0].value:])
+
+
+@BuiltInFunc
 def list_ref(args):
     lst, idx = args
     return lst.items[idx.value]

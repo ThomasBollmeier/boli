@@ -22,6 +22,38 @@ class TestListFunctions:
         (main)
         """, "'(2 3 4)")
 
+    def test_take(self):
+
+        self._assert_code("""
+        (def (main) 
+            (def lst '(1 2 3 4))
+            (take 2 lst))
+        (main)
+        """, "'(1 2)")
+
+        self._assert_code("""
+        (def (main) 
+            (def lst '(1 2 3 4))
+            (take 5 lst))
+        (main)
+        """, "'(1 2 3 4)")
+
+    def test_drop(self):
+
+        self._assert_code("""
+        (def (main) 
+            (def lst '(1 2 3 4))
+            (drop 2 lst))
+        (main)
+        """, "'(3 4)")
+
+        self._assert_code("""
+        (def (main) 
+            (def lst '(1 2 3 4))
+            (drop 5 lst))
+        (main)
+        """, "'()")
+
     def test_list_ref(self):
 
         self._assert_code("""
