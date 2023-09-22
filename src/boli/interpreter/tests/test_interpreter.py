@@ -229,6 +229,19 @@ class TestInterpreter:
         assert isinstance(value, String)
         assert str(value) == "the answer to everything"
 
+    def test_let_expression(self):
+        code = """
+        (def (main)
+            (let [(answer 42)]
+                (cond
+                    [(= answer 42) "the answer to everything"]
+                    [#t i-will-not-be-evaluated])))
+        (main)
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, String)
+        assert str(value) == "the answer to everything"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

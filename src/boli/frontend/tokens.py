@@ -32,6 +32,7 @@ class TokenType:
     DOT_3 = 30
     BLOCK = 31
     COND = 32
+    LET = 33
     UNKNOWN = -1
 
 
@@ -57,7 +58,8 @@ KEYWORDS = {
     "if": TokenType.IF,
     "lambda": TokenType.LAMBDA,
     "block": TokenType.BLOCK,
-    "cond": TokenType.COND
+    "cond": TokenType.COND,
+    "let": TokenType.LET
 }
 
 OP_TYPE_TO_STR = {

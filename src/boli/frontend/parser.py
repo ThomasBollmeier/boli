@@ -131,6 +131,8 @@ class Parser:
                     return self._block(expected_end)
                 if next_token.token_type == TokenType.COND:
                     return self._cond(expected_end)
+                if next_token.token_type == TokenType.LET:
+                    return self._let(expected_end)
                 return self._call(expected_end)
             return self._quote(expected_end)
         elif token.token_type == TokenType.QUOTE:
@@ -141,6 +143,37 @@ class Parser:
             return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _let(self, end_token_type) -> Ast:
+        self._advance([TokenType.LET])
+
+        block_elements = []
+
+        def_block_start = self._advance(LEFT_TOKENS)
+        def_block_end_type = LEFT_TO_RIGHT_MAP[def_block_start.token_type]
+        while True:
+            next_token = self._lexer.peek()
+            if next_token and next_token.token_type == def_block_end_type:
+                self._advance()
+                break
+            block_elements.append(self._let_vardef())
+
+        while True:
+            next_token = self._lexer.peek()
+            if next_token and next_token.token_type == end_token_type:
+                self._advance()
+                break
+            block_elements.append(self.expression())
+
+        return Block(block_elements)
+
+    def _let_vardef(self) -> Ast:
+        start = self._advance(LEFT_TOKENS)
+        end_type = LEFT_TO_RIGHT_MAP[start.token_type]
+        ident_tok = self._advance([TokenType.IDENT])
+        expression = self.expression()
+        self._advance([end_type])
+        return Definition(Identifier(ident_tok), expression)
 
     def _cond(self, end_token_type) -> Ast:
         self._advance([TokenType.COND])
@@ -162,28 +195,15 @@ class Parser:
 
     def _block(self, end_token_type) -> Ast:
         self._advance([TokenType.BLOCK])
-        expressions = []
+        block_elements = []
         while True:
-            next_tokens = self._lexer.peek_many(2)
-            try:
-                next_token = next_tokens[0]
-            except IndexError:
-                raise Exception("Expected token but found none")
-            try:
-                next_next_token = next_tokens[1]
-            except IndexError:
-                next_next_token = None
+            next_token = self._lexer.peek()
             if next_token and next_token.token_type == end_token_type:
                 self._advance()
                 break
-            if next_next_token and next_next_token.token_type == TokenType.DEF:
-                self._advance()
-                self._advance()
-                expressions.append(self._definition(LEFT_TO_RIGHT_MAP[next_token.token_type]))
-            else:
-                expressions.append(self.expression())
+            block_elements.append(self._body_element())
 
-        return Block(expressions)
+        return Block(block_elements)
 
     def _lambda(self, end_lambda_token_type) -> Ast:
         self._advance()
@@ -300,7 +320,7 @@ class Parser:
             "[": TokenType.RIGHT_BRACKET,
         }[lexeme]
 
-    def _advance(self, expected_token_types = None) -> Token | None:
+    def _advance(self, expected_token_types=None) -> Token | None:
         token = self._lexer.advance()
         if token is None:
             if expected_token_types is None:
