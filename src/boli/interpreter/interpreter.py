@@ -4,7 +4,8 @@ from boli.frontend.ast import BuiltInOperator, Identifier
 from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
-from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall
+from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall, Symbol, \
+    StructType
 from boli.interpreter.builtin import is_truthy
 
 
@@ -52,13 +53,24 @@ class Interpreter(AstVisitor):
         return value
 
     def visit_symbol(self, symbol):
-        pass
+        return Symbol(symbol.symbol_tok.name)
 
     def visit_keyword(self, keyword):
         pass
 
     def visit_struct(self, struct):
-        pass
+        name = struct.name_tok.name
+        fields = [field.ident_tok.name for field in struct.fields]
+
+        struct_type = StructType(name, fields)
+
+        self._cur_env.insert(name, struct_type)
+        self._cur_env.insert(f"create-{name}", struct_type.make_create())
+        for field in fields:
+            self._cur_env.insert(f"{name}-{field}", struct_type.make_getter(field))
+            self._cur_env.insert(f"{name}-set-{field}!", struct_type.make_setter(field))
+
+        return Nil()
 
     def visit_list(self, lst):
         return List([elem.accept(self) for elem in lst.elements])

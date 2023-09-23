@@ -63,7 +63,7 @@ class TestInterpreter:
             i-will-not-be-evaluated)
         """
         value = self._eval_code(code, String)
-        assert str(value) == "the answer to everything"
+        assert str(value) == '"the answer to everything"'
 
         code = """
         (if (not 42)
@@ -71,7 +71,7 @@ class TestInterpreter:
             "the answer to everything")
         """
         value = self._eval_code(code, String)
-        assert str(value) == "the answer to everything"
+        assert str(value) == '"the answer to everything"'
 
     def test_cond_expr(self):
 
@@ -227,7 +227,7 @@ class TestInterpreter:
         """
         value = Interpreter().eval_program(code)
         assert isinstance(value, String)
-        assert str(value) == "the answer to everything"
+        assert str(value) == '"the answer to everything"'
 
     def test_let_expression(self):
         code = """
@@ -240,7 +240,37 @@ class TestInterpreter:
         """
         value = Interpreter().eval_program(code)
         assert isinstance(value, String)
-        assert str(value) == "the answer to everything"
+        assert str(value) == '"the answer to everything"'
+
+    def test_struct_type(self):
+        code = """
+        (def-struct person (name first-name sex))
+        (def (main)
+            person)
+        (main)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, StructType)
+        assert str(value) == """(def-struct person (name first-name sex))"""
+
+    def test_struct(self):
+        code = """
+        (def-struct person (name first-name sex))
+        (def (main)
+            (def ego (create-person "Ballermeier" "Thomas" 'male))
+            (writeln)
+            (writeln (person-name ego))
+            (writeln (person-first-name ego))
+            (writeln (person-sex ego))
+            (person-set-name! ego "Bollmeier")
+            ego)
+        (main)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Struct)
+        assert str(value) == """(person "Bollmeier" "Thomas" 'male)"""
 
     @staticmethod
     def _eval_code(code, expected_type):

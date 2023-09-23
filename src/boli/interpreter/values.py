@@ -52,7 +52,17 @@ class String(Value):
         self.value = str_val
 
     def __str__(self):
-        return self.value
+        return '"' + self.value + '"'
+
+
+class Symbol(Value):
+
+    def __init__(self, symbol_name):
+        Value.__init__(self)
+        self.value = symbol_name
+
+    def __str__(self):
+        return f"'{self.value}"
 
 
 class List(Value):
@@ -132,6 +142,55 @@ class Lambda(Value, Callable):
             func_env.insert(var_param_name, List(args[param_idx:]))
 
         return func_interpreter
+
+
+class StructType(Value):
+
+    def __init__(self, name, fields):
+        Value.__init__(self)
+        self.name = name
+        self.fields = fields
+        self.field_indices = dict(zip(fields, range(len(fields))))
+
+    def __str__(self):
+        return f"""(def-struct {self.name} ({" ".join(self.fields) }))"""
+
+    def make_create(self):
+        @BuiltInFunc
+        def create(field_values):
+            return Struct(self, field_values)
+        return create
+
+    def make_getter(self, field):
+        @BuiltInFunc
+        def getter(args):
+            instance = args[0]
+            field_idx = self.field_indices[field]
+            return instance.field_values[field_idx]
+        return getter
+
+    def make_setter(self, field):
+        @BuiltInFunc
+        def setter(args):
+            instance, field_value = args
+            field_idx = self.field_indices[field]
+            instance.field_values[field_idx] = field_value
+            return Nil()
+        return setter
+
+
+class Struct(Value):
+
+    def __init__(self, struct_type, field_values):
+        Value.__init__(self)
+        self.struct_type = struct_type
+        if len(field_values) != len(self.struct_type.fields):
+            raise Exception("Numbers of values and fields do not match")
+        self.field_values = field_values
+
+    def __str__(self):
+        values_str = " ".join([str(field_val) for field_val in self.field_values])
+        return f"({self.struct_type.name} {values_str})"
 
 
 class TailCall(Exception):
