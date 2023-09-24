@@ -60,5 +60,10 @@ def create_global_environment() -> Environment:
     ret.insert("cons", cons)
     ret.insert("map", map_)
     ret.insert("filter", filter_)
+    ret.insert("create-hash-table", create_hash_table)
+    ret.insert("hash-set!", hash_set_bang)
+    ret.insert("hash-remove!", hash_remove_bang)
+    ret.insert("hash-exists?", hash_exists)
+    ret.insert("hash-ref", hash_ref)
 
     return ret

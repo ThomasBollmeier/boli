@@ -156,6 +156,49 @@ def set_bang(interpreter, args):
     return Nil()
 
 
+@BuiltInFunc
+def create_hash_table(args):
+    ret = HashTable()
+    if len(args) % 2 != 0:
+        raise Exception("#keys and #values do not match")
+    for i, arg in enumerate(args):
+        if i % 2 == 0:
+            if not isinstance(arg, Symbol) and not isinstance(arg, String):
+                raise Exception("Only symbols or strings are supported as hash keys")
+            key = arg
+        else:
+            ret.set_bang(key, arg)
+    return ret
+
+
+@BuiltInFunc
+def hash_set_bang(args):
+    hash_table, key, value = args
+    if not isinstance(key, Symbol) and not isinstance(key, String):
+        raise Exception("Only symbols or strings are supported as hash keys")
+    return hash_table.set_bang(key, value)
+
+
+@BuiltInFunc
+def hash_remove_bang(args):
+    hash_table, key = args
+    if not isinstance(key, Symbol) and not isinstance(key, String):
+        raise Exception("Only symbols or strings are supported as hash keys")
+    return hash_table.remove_bang(key)
+
+
+@BuiltInFunc
+def hash_exists(args):
+    hash_table, key = args
+    return hash_table.exists(key)
+
+
+@BuiltInFunc
+def hash_ref(args):
+    hash_table, key = args
+    return hash_table.ref(key)
+
+
 def is_truthy(value):
     if isinstance(value, Bool):
         return value.value

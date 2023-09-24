@@ -75,6 +75,36 @@ class List(Value):
         return "'(" + " ".join([str(item) for item in self.items]) + ")"
 
 
+class HashTable(Value):
+
+    def __init__(self):
+        Value.__init__(self)
+        self.key_values = {}
+
+    def set_bang(self, key, value):
+        self.key_values[str(key)] = value
+        return self
+
+    def remove_bang(self, key):
+        key_str = str(key)
+        if key_str in self.key_values:
+            del self.key_values[key_str]
+        return self
+
+    def exists(self, key):
+        return Bool(str(key) in self.key_values)
+
+    def ref(self, key):
+        key_str = str(key)
+        if key_str in self.key_values:
+            return self.key_values[key_str]
+        return Nil()
+
+    def __str__(self):
+        key_values_str = " ".join([f"{key} {value}" for key, value in self.key_values.items()])
+        return f"(hash-table {key_values_str})"
+
+
 class Callable:
 
     def __init__(self, with_lazy_arg_eval=False):

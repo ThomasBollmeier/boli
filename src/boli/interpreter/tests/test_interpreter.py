@@ -79,9 +79,11 @@ class TestInterpreter:
         (block
             (def answer 42)
             (cond
-                [(= answer 42) "the answer to everythind"]
+                [(= answer 42) "the answer to everything"]
                 [#t i-will-not-be-evaluated]))
         """
+        value = self._eval_code(code, String)
+        assert str(value) == '"the answer to everything"'
 
     def test_function_call(self):
 
