@@ -1,5 +1,5 @@
 from boli.interpreter.interpreter import Interpreter
-from boli.interpreter.values import HashTable, String, Bool
+from boli.interpreter.values import HashTable, Integer, String, Bool
 
 
 class TestHashTable:
@@ -47,6 +47,24 @@ class TestHashTable:
         (def (main) 
             (def ego (create-hash-table 'name "Bollmeier" 'first-name "Thomas"))
             (hash-exists? ego 'name))
+        (main)
+        """, "#t", Bool)
+
+    def test_count(self):
+
+        self._assert_code("""
+        (def (main) 
+            (def ego (create-hash-table 'name "Bollmeier" 'first-name "Thomas"))
+            (count ego))
+        (main)
+        """, "2", Integer)
+
+    def test_empty(self):
+
+        self._assert_code("""
+        (def (main) 
+            (def some-data (create-hash-table))
+            (empty? some-data))
         (main)
         """, "#t", Bool)
 

@@ -157,6 +157,28 @@ def set_bang(interpreter, args):
 
 
 @BuiltInFunc
+def count(args):
+    container_type = args[0]
+    if isinstance(container_type, List):
+        return Integer(len(container_type.items))
+    elif isinstance(container_type, HashTable):
+        return Integer(len(container_type.key_values))
+    else:
+        raise Exception("Unsupported type for 'count'")
+
+
+@BuiltInFunc
+def is_empty(args):
+    container_type = args[0]
+    if isinstance(container_type, List):
+        return Bool(len(container_type.items) == 0)
+    elif isinstance(container_type, HashTable):
+        return Bool(len(container_type.key_values) == 0)
+    else:
+        raise Exception("Unsupported type for 'empty?'")
+
+
+@BuiltInFunc
 def create_hash_table(args):
     ret = HashTable()
     if len(args) % 2 != 0:

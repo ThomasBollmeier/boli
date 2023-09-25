@@ -41,16 +41,6 @@ def concat(args):
 
 
 @BuiltInFunc
-def count(args):
-    return Integer(len(args[0].items))
-
-
-@BuiltInFunc
-def is_empty(args):
-    return Bool(len(args[0].items) == 0)
-
-
-@BuiltInFunc
 def cons(args):
     item, lst = args
     return List([item] + lst.items)
