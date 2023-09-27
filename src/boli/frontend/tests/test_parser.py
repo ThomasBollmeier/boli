@@ -10,7 +10,6 @@ class TestParser:
         code = """
         (def nothing nil)
         (def answer-to-everything (+ 41 1))
-        (def ego "Thomas") ; <- that is me
         (def my-nested-list '(1 2 3 (4 5)))
         (def sex (if (male? ego) 
                      'male
@@ -18,6 +17,13 @@ class TestParser:
         (def my-add1 (lambda (x) (+ x 1)))
         (def (my-sum numbers...)
             (+ ...numbers))
+            
+        (def-struct person (name first-name))
+        (def ego (create-person "Bollmeier" "Thomas")) ;; <-- that is me
+        
+        "A string"
+        person
+        'a-symbol
         """
 
         parser = Parser(Source(code))

@@ -1,4 +1,5 @@
-from boli.interpreter.values import BuiltInFunc, List, Bool, Integer, Nil
+from boli.interpreter.values import BuiltInFunc, List, Bool, Nil
+from boli.interpreter.error import InterpreterError
 
 
 @BuiltInFunc
@@ -62,7 +63,7 @@ def filter_(args):
     for item in lst.items:
         result = lambda_([item])
         if not isinstance(result, Bool):
-            raise Exception("Boolean result expected")
+            raise InterpreterError("Boolean result expected")
         if result.value:
             new_items.append(item)
     return List(new_items)

@@ -1,3 +1,6 @@
+from boli.interpreter.error import InterpreterError
+
+
 class Value:
     def __init__(self):
         pass
@@ -7,6 +10,9 @@ class Nil(Value):
 
     def __init__(self):
         Value.__init__(self)
+
+    def __str__(self):
+        return "nil"
 
 
 class Number:
@@ -215,7 +221,7 @@ class Struct(Value):
         Value.__init__(self)
         self.struct_type = struct_type
         if len(field_values) != len(self.struct_type.fields):
-            raise Exception("Numbers of values and fields do not match")
+            raise InterpreterError("Numbers of values and fields do not match")
         self.field_values = field_values
 
     def __str__(self):
@@ -223,7 +229,7 @@ class Struct(Value):
         return f"({self.struct_type.name} {values_str})"
 
 
-class TailCall(Exception):
+class TailCall(InterpreterError):
 
     def __init__(self, args):
         self.args = args

@@ -7,6 +7,7 @@ from boli.interpreter.environment import create_global_environment, Environment
 from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall, Symbol, \
     StructType
 from boli.interpreter.builtin import is_truthy
+from boli.interpreter.error import InterpreterError
 
 
 class Interpreter(AstVisitor):
@@ -49,7 +50,7 @@ class Interpreter(AstVisitor):
         name = ident.ident_tok.name
         value = self._cur_env.lookup(name)
         if value is None:
-            raise Exception(f"Identifier '{name}' is unknown")
+            raise InterpreterError(f"Identifier '{name}' is unknown")
         return value
 
     def visit_symbol(self, symbol):
@@ -91,7 +92,7 @@ class Interpreter(AstVisitor):
     def visit_if(self, if_expr):
         callable_ = self._cur_env.lookup("if")
         if not isinstance(callable_, Callable):
-            raise Exception("if is not callable")
+            raise InterpreterError("if is not callable")
         return callable_(self, [if_expr.condition,
                                 if_expr.consequent,
                                 if_expr.alternate])
@@ -133,9 +134,9 @@ class Interpreter(AstVisitor):
         vararg_name = vararg.ident_tok.name
         vararg_value = self._cur_env.lookup(vararg_name)
         if vararg_value is None:
-            raise Exception(f"Identifier '{vararg_name}' is unknown")
+            raise InterpreterError(f"Identifier '{vararg_name}' is unknown")
         if not isinstance(vararg_value, List):
-            raise Exception("Vararg must be of list type")
+            raise InterpreterError("Vararg must be of list type")
         return [it for it in vararg_value.items]
 
     def visit_builtin_op(self, builtin_op):
@@ -161,6 +162,6 @@ class Interpreter(AstVisitor):
 
         ret = self._cur_env.lookup(key)
         if not isinstance(ret, Callable):
-            raise Exception("Expected callable function")
+            raise InterpreterError("Expected callable function")
 
         return ret

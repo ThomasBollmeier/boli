@@ -1,4 +1,5 @@
 from boli.interpreter.values import *
+from boli.interpreter.error import InterpreterError
 from boli.frontend.ast import Identifier
 
 
@@ -58,7 +59,7 @@ def mod(args):
         if isinstance(a, Integer) and isinstance(b, Integer):
             return Integer(a.value % b.value)
         else:
-            raise Exception("Modulo operator requires integer operands")
+            raise InterpreterError("Modulo operator requires integer operands")
     return _apply(args, _mod)
 
 
@@ -111,7 +112,7 @@ def or_(interpreter, args):
 @BuiltInFunc
 def not_(args):
     if len(args) != 1:
-        raise Exception("not expects a single argument")
+        raise InterpreterError("not expects a single argument")
     return Bool(not is_truthy(args[0]))
 
 
@@ -143,14 +144,14 @@ def writeln(args):
 @BuiltInFuncLazy
 def set_bang(interpreter, args):
     if len(args) != 2:
-        raise Exception("function set! expects two arguments")
+        raise InterpreterError("function set! expects two arguments")
     if not isinstance(args[0], Identifier):
-        raise Exception("set!: first argument must be identifier")
+        raise InterpreterError("set!: first argument must be identifier")
     name = args[0].ident_tok.name
     env = interpreter.get_environment()
     def_env = env.lookup_defining_env(name)
     if def_env is None:
-        raise Exception(f"identifier {name} is unknown")
+        raise InterpreterError(f"identifier {name} is unknown")
     value = args[1].accept(interpreter)
     def_env.insert(name, value)
     return Nil()
@@ -164,7 +165,7 @@ def count(args):
     elif isinstance(container_type, HashTable):
         return Integer(len(container_type.key_values))
     else:
-        raise Exception("Unsupported type for 'count'")
+        raise InterpreterError("Unsupported type for 'count'")
 
 
 @BuiltInFunc
@@ -175,18 +176,18 @@ def is_empty(args):
     elif isinstance(container_type, HashTable):
         return Bool(len(container_type.key_values) == 0)
     else:
-        raise Exception("Unsupported type for 'empty?'")
+        raise InterpreterError("Unsupported type for 'empty?'")
 
 
 @BuiltInFunc
 def create_hash_table(args):
     ret = HashTable()
     if len(args) % 2 != 0:
-        raise Exception("#keys and #values do not match")
+        raise InterpreterError("#keys and #values do not match")
     for i, arg in enumerate(args):
         if i % 2 == 0:
             if not isinstance(arg, Symbol) and not isinstance(arg, String):
-                raise Exception("Only symbols or strings are supported as hash keys")
+                raise InterpreterError("Only symbols or strings are supported as hash keys")
             key = arg
         else:
             ret.set_bang(key, arg)
@@ -197,7 +198,7 @@ def create_hash_table(args):
 def hash_set_bang(args):
     hash_table, key, value = args
     if not isinstance(key, Symbol) and not isinstance(key, String):
-        raise Exception("Only symbols or strings are supported as hash keys")
+        raise InterpreterError("Only symbols or strings are supported as hash keys")
     return hash_table.set_bang(key, value)
 
 
@@ -205,7 +206,7 @@ def hash_set_bang(args):
 def hash_remove_bang(args):
     hash_table, key = args
     if not isinstance(key, Symbol) and not isinstance(key, String):
-        raise Exception("Only symbols or strings are supported as hash keys")
+        raise InterpreterError("Only symbols or strings are supported as hash keys")
     return hash_table.remove_bang(key)
 
 
@@ -234,7 +235,7 @@ def _apply(args, bin_fn, left_associative=True):
     if left_associative:
         for arg in args:
             if not isinstance(arg, Number):
-                raise Exception("Invalid argument type")
+                raise InterpreterError("Invalid argument type")
             if isinstance(ret, Nil):
                 ret = arg
             else:
@@ -243,7 +244,7 @@ def _apply(args, bin_fn, left_associative=True):
         args_rev = reversed(args)
         for arg in args_rev:
             if not isinstance(arg, Number):
-                raise Exception("Invalid argument type")
+                raise InterpreterError("Invalid argument type")
             if isinstance(ret, Nil):
                 ret = arg
             else:
@@ -254,12 +255,12 @@ def _apply(args, bin_fn, left_associative=True):
 
 def _compare(args, fn):
     if len(args) < 2:
-        raise Exception("Comparisons require at least two arguments")
+        raise InterpreterError("Comparisons require at least two arguments")
 
     prev = None
     for arg in args:
         if not isinstance(arg, Number):
-            raise Exception("Invalid argument type")
+            raise InterpreterError("Invalid argument type")
         if prev is not None and not fn(prev, arg.value):
             return Bool(False)
         prev = arg.value

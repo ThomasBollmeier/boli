@@ -19,10 +19,11 @@ class Parser:
         children = []
 
         while True:
-            token = self._lexer.advance()
+            token = self._lexer.peek()
             if token is None:
                 break
             if token.token_type in LEFT_TOKENS:
+                self._advance()
                 next_token = self._lexer.peek()
                 if next_token is None:
                     raise ParseError("Expected token but got none")
@@ -35,7 +36,7 @@ class Parser:
                 else:
                     child = self._call(LEFT_TO_RIGHT_MAP[token.token_type])
             else:
-                raise ParseError(f"Token type {token.token_type} cannot be used on top level")
+                child = self.expression()
             if child is not None:
                 children.append(child)
 
