@@ -18,15 +18,15 @@ def repl():
         if code[-1] == "\\":
             code = code[:-1]
             continue
-        stop, code = _handle_command(interpreter, code)
-        if stop:
-            break
-        if code:
-            try:
+        try:
+            stop, code = _handle_command(interpreter, code)
+            if stop:
+                break
+            if code:
                 value = interpreter.eval_program(code)
                 print(value)
-            except (ParseError, InterpreterError) as error:
-                print(error)
+        except (ParseError, InterpreterError, FileNotFoundError) as error:
+            print(error)
         code = ""
 
 
@@ -39,8 +39,7 @@ def _handle_command(interpreter, code):
             print("Usage: ':l(oad) <file>'")
         else:
             _load_file(interpreter, parts[1].strip())
-        return True, ""
-
+        return False, ""
     elif code in [":h", ":help"]:
         _print_help()
         return False, ""
