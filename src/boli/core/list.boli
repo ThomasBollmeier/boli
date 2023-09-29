@@ -1,0 +1,13 @@
+(def (foldl fn init-val lst)
+    (def (foldl-helper lst acc)
+        (if (empty? lst)
+            acc
+            (foldl-helper (tail lst) (fn acc (head lst)))))
+    (foldl-helper lst init-val))
+
+(def (reverse lst)
+    (def (reverse-helper lst acc)
+        (if (empty? lst)
+            acc
+            (reverse-helper (tail lst) (cons (head lst) acc))))
+    (reverse-helper lst '()))
