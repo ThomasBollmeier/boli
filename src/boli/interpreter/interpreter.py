@@ -1,6 +1,6 @@
 from boli.frontend.source import Source
 from boli.frontend.parser import Parser
-from boli.frontend.ast import BuiltInOperator, Identifier
+from boli.frontend.ast import BuiltInOperator, Identifier, Call
 from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
@@ -162,6 +162,8 @@ class Interpreter(AstVisitor):
             key = OP_TYPE_TO_STR[callee.op_tok.token_type]
         elif isinstance(callee, Identifier):
             key = callee.ident_tok.name
+        elif isinstance(callee, Call):
+            return callee.accept(self)
         else:
             raise NotImplementedError()
 

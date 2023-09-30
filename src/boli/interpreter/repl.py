@@ -1,7 +1,6 @@
 from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.error import InterpreterError
 from boli.frontend.parser import ParseError
-from os.path import abspath, dirname, sep
 
 
 def repl():

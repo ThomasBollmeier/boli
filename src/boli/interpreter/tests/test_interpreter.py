@@ -187,8 +187,7 @@ class TestInterpreter:
         (def (make-adder n)
             (lambda (m)
                 (+ m n)))
-        (def add-3 (make-adder 3))
-        (add-3 39)    
+        ((make-adder 3) 39)    
         """
 
         value = Interpreter().eval_program(code)
