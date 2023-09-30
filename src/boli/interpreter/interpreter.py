@@ -8,12 +8,17 @@ from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool
     StructType
 from boli.interpreter.builtin import is_truthy
 from boli.interpreter.error import InterpreterError
+from boli.interpreter.module_loader import ModuleLoader
 
 
 class Interpreter(AstVisitor):
 
     def __init__(self, env=None):
-        self._cur_env = create_global_environment() if env is None else env
+        if env is None:
+            self._cur_env = create_global_environment()
+            ModuleLoader().load_file(self, "list")  # <-- load list functions
+        else:
+            self._cur_env = env
 
     def new_child(self):
         return Interpreter(Environment(self._cur_env))

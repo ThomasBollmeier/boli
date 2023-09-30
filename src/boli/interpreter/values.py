@@ -130,6 +130,9 @@ class BuiltInFunc(Value, Callable):
     def __call__(self, args):
         return self._func(args)
 
+    def __str__(self):
+        return "<BuiltInFunction>"
+
 
 class BuiltInFuncLazy(Value, Callable):
 
@@ -140,6 +143,9 @@ class BuiltInFuncLazy(Value, Callable):
 
     def __call__(self, interpreter, args):
         return self._func(interpreter, args)
+
+    def __str__(self):
+        return "<BuiltInFunction>"
 
 
 class Lambda(Value, Callable):
@@ -178,6 +184,9 @@ class Lambda(Value, Callable):
             func_env.insert(var_param_name, List(args[param_idx:]))
 
         return func_interpreter
+
+    def __str__(self):
+        return "<LambdaFunction>"
 
 
 class StructType(Value):

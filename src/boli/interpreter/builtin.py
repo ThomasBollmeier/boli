@@ -106,7 +106,7 @@ def or_(interpreter, args):
         arg_val = arg.accept(interpreter)
         if is_truthy(arg_val):
             return arg_val
-    return Bool(False) and args or Bool(True)
+    return Bool(False) if args else Bool(True)
 
 
 @BuiltInFunc

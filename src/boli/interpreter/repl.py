@@ -10,9 +10,6 @@ def repl():
     print("boli REPL 1.0.0")
     _print_help()
 
-    core_dir = abspath(dirname(__file__) + sep + ".." + sep + "core")
-    _load_file(interpreter, core_dir + sep + "list.boli")
-
     while True:
         code += input("boli> ")
         if code[-1] == "\\":

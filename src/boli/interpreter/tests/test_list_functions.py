@@ -139,12 +139,6 @@ class TestListFunctions:
     def test_fold_left(self):
 
         code = """
-        (def (foldl fn init-val lst)
-            (def (foldl-helper lst acc)
-                (if (empty? lst)
-                    acc
-                    (foldl-helper (tail lst) (fn acc (head lst)))))
-            (foldl-helper lst init-val))
         (def (main)
             (foldl * 1 '(1 2 3 4)))
         (main)
@@ -152,14 +146,18 @@ class TestListFunctions:
 
         self._assert_code(code, "24", Integer)
 
+    def test_fold_right(self):
+
+        code = """
+        (def (main)
+            (foldr - 0 '(1 2 3 4))) ;; --> (1 - (2 - (3 - (4 - 0)))) = -2
+        (main)
+        """
+
+        self._assert_code(code, "-2", Integer)
+
     def test_reverse(self):
         code = """
-         (def (reverse lst)
-             (def (reverse-helper lst acc)
-                 (if (empty? lst)
-                     acc
-                     (reverse-helper (tail lst) (cons (head lst) acc))))
-             (reverse-helper lst '()))
          (def (main)
              (reverse '(1 2 3 4)))
          (main)

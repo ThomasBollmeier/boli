@@ -13,16 +13,6 @@ def tail(args):
 
 
 @BuiltInFunc
-def take(args):
-    return List(args[1].items[:args[0].value])
-
-
-@BuiltInFunc
-def drop(args):
-    return List(args[1].items[args[0].value:])
-
-
-@BuiltInFunc
 def list_ref(args):
     lst, idx = args
     return lst.items[idx.value]
@@ -45,25 +35,3 @@ def concat(args):
 def cons(args):
     item, lst = args
     return List([item] + lst.items)
-
-
-@BuiltInFunc
-def map_(args):
-    lambda_, lst = args
-    new_items = []
-    for item in lst.items:
-        new_items.append(lambda_([item]))
-    return List(new_items)
-
-
-@BuiltInFunc
-def filter_(args):
-    lambda_, lst = args
-    new_items = []
-    for item in lst.items:
-        result = lambda_([item])
-        if not isinstance(result, Bool):
-            raise InterpreterError("Boolean result expected")
-        if result.value:
-            new_items.append(item)
-    return List(new_items)
