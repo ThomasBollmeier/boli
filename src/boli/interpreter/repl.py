@@ -1,12 +1,31 @@
+from argparse import ArgumentParser
 from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.error import InterpreterError
 from boli.frontend.parser import ParseError
+
+BOLI_VERSION = "0.2.0"
+
+
+def run():
+    parser = ArgumentParser('Run a boli program')
+    parser.add_argument('source_file',
+                        nargs='?')
+    parser.add_argument('--version',
+                        action='version',
+                        version=BOLI_VERSION)
+
+    args = parser.parse_args()
+
+    if not args.source_file:
+        repl()
+    else:
+        _load_file(Interpreter(), args.source_file)
 
 
 def repl():
     interpreter = Interpreter()
     code = ""
-    print("boli REPL 1.0.0")
+    print(f"boli REPL {BOLI_VERSION}")
     _print_help()
 
     while True:
@@ -53,4 +72,4 @@ def _print_help():
 
 
 if __name__ == "__main__":
-    repl()
+    run()
