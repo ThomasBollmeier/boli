@@ -164,6 +164,8 @@ def count(args):
         return Integer(len(container_type.items))
     elif isinstance(container_type, HashTable):
         return Integer(len(container_type.key_values))
+    elif isinstance(container_type, String):
+        return Integer(len(container_type.value))
     else:
         raise InterpreterError("Unsupported type for 'count'")
 

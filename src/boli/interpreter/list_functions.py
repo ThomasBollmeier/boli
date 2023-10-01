@@ -27,8 +27,10 @@ def list_set_bang(args):
 
 @BuiltInFunc
 def concat(args):
-    lst_a, lst_b = args
-    return List(lst_a.items + lst_b.items)
+    total_list = []
+    for lst in args:
+        total_list.extend(lst.items)
+    return List(total_list)
 
 
 @BuiltInFunc

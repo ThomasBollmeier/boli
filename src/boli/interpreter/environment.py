@@ -1,5 +1,6 @@
 from boli.interpreter.builtin import *
 from boli.interpreter.list_functions import *
+from boli.interpreter.string_functions import *
 
 
 class Environment:
@@ -61,5 +62,10 @@ def create_global_environment() -> Environment:
     ret.insert("hash-remove!", hash_remove_bang)
     ret.insert("hash-exists?", hash_exists)
     ret.insert("hash-ref", hash_ref)
+    ret.insert("str-sub", str_sub)
+    ret.insert("str-replace", str_replace)
+    ret.insert("str-concat", str_concat)
+    ret.insert("str->upper", str_to_upper)
+    ret.insert("str->lower", str_to_lower)
 
     return ret
