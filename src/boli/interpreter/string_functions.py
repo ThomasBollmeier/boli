@@ -30,10 +30,10 @@ def str_concat(args):
 
 
 @BuiltInFunc
-def str_to_upper(args):
+def str_upper(args):
     return String(args[0].value.upper())
 
 
 @BuiltInFunc
-def str_to_lower(args):
+def str_lower(args):
     return String(args[0].value.lower())

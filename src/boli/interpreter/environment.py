@@ -65,7 +65,7 @@ def create_global_environment() -> Environment:
     ret.insert("str-sub", str_sub)
     ret.insert("str-replace", str_replace)
     ret.insert("str-concat", str_concat)
-    ret.insert("str->upper", str_to_upper)
-    ret.insert("str->lower", str_to_lower)
+    ret.insert("str-upper", str_upper)
+    ret.insert("str-lower", str_lower)
 
     return ret

@@ -16,6 +16,10 @@ class ModuleLoader:
             code = f.read()
             interpreter.eval_program(code)
 
+    def load_files(self, interpreter, module_names):
+        for module_name in module_names:
+            self.load_file(interpreter, module_name)
+
     def _find_file_path(self, module_name):
         for module_path in self._module_paths:
             file_path = module_path + os.sep + module_name + ".boli"

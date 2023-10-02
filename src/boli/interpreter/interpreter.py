@@ -16,7 +16,9 @@ class Interpreter(AstVisitor):
     def __init__(self, env=None):
         if env is None:
             self._cur_env = create_global_environment()
-            ModuleLoader().load_file(self, "list")  # <-- load list functions
+            # Load functions from core library
+            module_loader = ModuleLoader()
+            module_loader.load_files(self, ["list", "string"])
         else:
             self._cur_env = env
 

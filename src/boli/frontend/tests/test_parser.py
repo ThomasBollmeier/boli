@@ -24,6 +24,10 @@ class TestParser:
         "A string"
         person
         'a-symbol
+        "A
+        multi-line
+        string
+        "
         """
 
         parser = Parser(Source(code))

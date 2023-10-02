@@ -29,20 +29,17 @@ class TestStringFunctions:
 
     def test_to_upper(self):
         self._assert_code("""
-        (str->upper "Thomas")
+        (str-upper "Thomas")
         """, '"THOMAS"')
 
     def test_to_lower(self):
         self._assert_code("""
-        (str->lower "Thomas")
+        (str-lower "Thomas")
         """, '"thomas"')
 
     def test_capitalize(self):
         self._assert_code("""
-        (def (capitalize s)
-            (str-concat (str->upper (str-sub s 0 1)) 
-                        (str-sub s 1)))
-        (capitalize "thomas")
+        (str-capitalize "thomas")
         """, '"Thomas"')
 
     @staticmethod
