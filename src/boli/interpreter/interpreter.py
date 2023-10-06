@@ -104,15 +104,6 @@ class Interpreter(AstVisitor):
                                 if_expr.consequent,
                                 if_expr.alternate])
 
-    def visit_cond(self, cond):
-        for branch in cond.branches:
-            if is_truthy(branch.condition.accept(self)):
-                return branch.expression.accept(self)
-        return Nil()
-
-    def visit_cond_branch(self, cond_branch):
-        pass
-
     def visit_lambda(self, lambda_):
         return Lambda(lambda_, self)
 

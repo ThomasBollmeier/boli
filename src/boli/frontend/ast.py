@@ -49,7 +49,7 @@ class Bool(Ast):
 
 class Nil(Ast):
 
-    def __init__(self, nil_tok):
+    def __init__(self, nil_tok=None):
         Ast.__init__(self)
         self.nil_tok = nil_tok
 
@@ -139,27 +139,6 @@ class If(Ast):
 
     def accept(self, visitor):
         return visitor.visit_if(self)
-
-
-class Cond(Ast):
-
-    def __init__(self, branches):
-        Ast.__init__(self)
-        self.branches = branches
-
-    def accept(self, visitor):
-        return visitor.visit_cond(self)
-
-
-class CondBranch(Ast):
-
-    def __init__(self, condition, expression):
-        Ast.__init__(self)
-        self.condition = condition
-        self.expression = expression
-
-    def accept(self, visitor):
-        visitor.visit_cond_branch(self)
 
 
 class Lambda(Ast):

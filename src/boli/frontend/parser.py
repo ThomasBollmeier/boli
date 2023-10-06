@@ -74,11 +74,6 @@ class Parser:
             self._find_tail_calls(ast.alternate)
             return
 
-        if isinstance(ast, Cond):
-            for branch in ast.branches:
-                self._find_tail_calls(branch.expression)
-            return
-
         if isinstance(ast, Block) and ast.expressions:
             self._find_tail_calls(ast.expressions[-1])
 
@@ -186,13 +181,21 @@ class Parser:
             if next_token is not None and next_token.token_type == end_token_type:
                 self._advance()
                 break
-        return Cond(branches)
+        if not branches:
+            raise ParseError("cond expression requires at least one branch")
+        condition, expression = branches[0]
+        ret = If(condition, expression, Nil())
+        current = ret
+        for condition, expression in branches[1:]:
+            current.alternate = If(condition, expression, Nil())
+            current = current.alternate
+        return ret
 
     def _cond_branch(self, end_token_type) -> Ast:
         condition = self.expression()
         expression = self.expression()
         self._advance([end_token_type])
-        return CondBranch(condition, expression)
+        return condition, expression
 
     def _block(self, end_token_type) -> Ast:
         self._advance([TokenType.BLOCK])
