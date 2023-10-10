@@ -59,6 +59,11 @@ class Lexer:
                 self._advance_char()
                 return self._scan_identifier(next_ch, line, column, is_part_of_symbol=True)
 
+            if ch == ":":
+                if self._source.peek() == ":":
+                    self._advance_char()
+                    return Token(TokenType.MODULE_SEP, line, column)
+
             if ch == ";":  # comment
                 self._skip_line_comment()
                 continue
@@ -82,7 +87,7 @@ class Lexer:
         return Quote(line, column, "'" + next_ch)
 
     def _scan_identifier(self, start_ch, line, column,is_part_of_symbol=False):
-        forbidden_start = {"!", "?", ".", ",", "*"}
+        forbidden_start = {"!", "?", ".", ",", "*", ":"}
         if start_ch in forbidden_start:
             return UnknownToken(line, column, start_ch)
 
@@ -115,7 +120,7 @@ class Lexer:
     def _is_valid_ident_char(self, ch):
         if ch in self._whitespace:
             return False
-        if ch in set(list('"(){}[]/.')):
+        if ch in set(list('"(){}[]/.:')):
             return False
         return True
 

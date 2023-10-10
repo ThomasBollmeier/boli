@@ -127,3 +127,19 @@ class TestParser:
         assert ast is not None
 
         ast.accept(AstPrinter())
+
+    def test_require(self):
+
+        code = """
+        (require misc::util util)
+        (def (main)
+            (util::guten-tag "Thomas"))
+        (main)
+        """
+
+        ast = Parser(Source(code)).program()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())
+

@@ -1,0 +1,5 @@
+(def (make-greeter prefix suffix)
+    (lambda (name)
+        (str-concat prefix name suffix)))
+
+(def guten-tag (make-greeter "Guten Tag, " "!"))

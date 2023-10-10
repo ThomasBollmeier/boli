@@ -1,4 +1,5 @@
 from boli.interpreter.interpreter import Interpreter
+from boli.interpreter.module_loader import ModuleLoader
 from boli.interpreter.values import List, Integer, Bool
 
 
@@ -168,6 +169,8 @@ class TestListFunctions:
     @staticmethod
     def _assert_code(code, expected_value, expected_type=None):
         expected_type = expected_type or List
-        value = Interpreter().eval_program(code)
+        interpreter = Interpreter()
+        ModuleLoader().load_module(interpreter, "list")
+        value = interpreter.eval_program(code)
         assert isinstance(value, expected_type)
         assert str(value) == expected_value

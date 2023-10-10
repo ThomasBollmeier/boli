@@ -33,6 +33,7 @@ class TokenType:
     BLOCK = 31
     COND = 32
     LET = 33
+    MODULE_SEP = 34
     UNKNOWN = -1
 
 

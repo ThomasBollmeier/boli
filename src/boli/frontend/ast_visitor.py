@@ -18,6 +18,9 @@ class AstVisitor:
     def visit_ident(self, ident):
         pass
 
+    def visit_abs_name(self, abs_name):
+        pass
+
     def visit_symbol(self, symbol):
         pass
 

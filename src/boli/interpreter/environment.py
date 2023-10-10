@@ -1,5 +1,6 @@
 from boli.interpreter.builtin import *
 from boli.interpreter.list_functions import *
+from boli.interpreter.module_loader import require
 from boli.interpreter.string_functions import *
 
 
@@ -26,6 +27,9 @@ class Environment:
 
     def insert(self, name, value):
         self._values[name] = value
+
+    def get_values(self):
+        return self._values
 
 
 def create_global_environment() -> Environment:
@@ -67,5 +71,6 @@ def create_global_environment() -> Environment:
     ret.insert("str-concat", str_concat)
     ret.insert("str-upper", str_upper)
     ret.insert("str-lower", str_lower)
+    ret.insert("require", require)
 
     return ret

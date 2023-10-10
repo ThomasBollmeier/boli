@@ -273,6 +273,18 @@ class TestInterpreter:
         assert isinstance(value, Struct)
         assert str(value) == """(person "Bollmeier" "Thomas" 'male)"""
 
+    def test_require(self):
+        code = """
+        (require misc::util ut)
+        (def (main)
+            (ut::guten-tag "Thomas"))
+        (main)
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, String)
+        assert str(value) == '"Guten Tag, Thomas!"'
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

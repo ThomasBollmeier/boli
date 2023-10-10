@@ -26,6 +26,9 @@ class AstPrinter(AstVisitor):
     def visit_ident(self, ident):
         self._write(f"Identifier({ident.ident_tok.name})")
 
+    def visit_abs_name(self, abs_name):
+        self._write(f"AbsoluteName({str(abs_name)})")
+
     def visit_symbol(self, symbol):
         self._write(f"Symbol({symbol.symbol_tok.name})")
 

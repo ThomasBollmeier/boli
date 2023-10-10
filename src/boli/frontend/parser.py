@@ -110,7 +110,7 @@ class Parser:
         elif token.token_type == TokenType.NIL:
             return Nil(token)
         elif token.token_type == TokenType.IDENT:
-            return Identifier(token)
+            return self._abs_name(token)
         elif token.token_type == TokenType.SYMBOL:
             return Symbol(token)
         elif token.token_type in LEFT_TOKENS:
@@ -139,6 +139,21 @@ class Parser:
             return Keyword(token)
 
         raise ParseError("Could not parse expression!")
+
+    def _abs_name(self, start_token):
+        module_path = []
+        curr_token = start_token
+        while True:
+            next_token = self._lexer.peek()
+            if next_token and next_token.token_type == TokenType.MODULE_SEP:
+                self._advance()
+                module_path.append(curr_token)
+                curr_token = self._advance([TokenType.IDENT])
+            else:
+                break
+        if not module_path:
+            return Identifier(curr_token)
+        return AbsoluteName(module_path, ident_tok=curr_token)
 
     def _let(self, end_token_type) -> Ast:
         self._advance([TokenType.LET])
@@ -191,7 +206,7 @@ class Parser:
             current = current.alternate
         return ret
 
-    def _cond_branch(self, end_token_type) -> Ast:
+    def _cond_branch(self, end_token_type):
         condition = self.expression()
         expression = self.expression()
         self._advance([end_token_type])

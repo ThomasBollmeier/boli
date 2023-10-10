@@ -2,4 +2,4 @@
 
 (def (str-capitalize s)
     (str-concat (str-upper (str-sub s 0 1))
-                (str-sub s 1)))
+                (str-lower (str-sub s 1))))

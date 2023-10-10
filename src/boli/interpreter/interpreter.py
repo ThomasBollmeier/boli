@@ -1,14 +1,12 @@
 from boli.frontend.source import Source
 from boli.frontend.parser import Parser
-from boli.frontend.ast import BuiltInOperator, Identifier, Call
+from boli.frontend.ast import BuiltInOperator, Identifier, Call, AbsoluteName
 from boli.frontend.ast_visitor import AstVisitor
 from boli.frontend.tokens import OP_TYPE_TO_STR
 from boli.interpreter.environment import create_global_environment, Environment
 from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall, Symbol, \
     StructType
-from boli.interpreter.builtin import is_truthy
 from boli.interpreter.error import InterpreterError
-from boli.interpreter.module_loader import ModuleLoader
 
 
 class Interpreter(AstVisitor):
@@ -16,9 +14,6 @@ class Interpreter(AstVisitor):
     def __init__(self, env=None):
         if env is None:
             self._cur_env = create_global_environment()
-            # Load functions from core library
-            module_loader = ModuleLoader()
-            module_loader.load_files(self, ["list", "string"])
         else:
             self._cur_env = env
 
@@ -55,6 +50,13 @@ class Interpreter(AstVisitor):
 
     def visit_ident(self, ident):
         name = ident.ident_tok.name
+        value = self._cur_env.lookup(name)
+        if value is None:
+            raise InterpreterError(f"Identifier '{name}' is unknown")
+        return value
+
+    def visit_abs_name(self, abs_name):
+        name = str(abs_name)
         value = self._cur_env.lookup(name)
         if value is None:
             raise InterpreterError(f"Identifier '{name}' is unknown")
@@ -155,6 +157,8 @@ class Interpreter(AstVisitor):
             key = OP_TYPE_TO_STR[callee.op_tok.token_type]
         elif isinstance(callee, Identifier):
             key = callee.ident_tok.name
+        elif isinstance(callee, AbsoluteName):
+            key = str(callee)
         elif isinstance(callee, Call):
             return callee.accept(self)
         else:

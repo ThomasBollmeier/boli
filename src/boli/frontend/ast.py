@@ -66,6 +66,25 @@ class Identifier(Ast):
     def accept(self, visitor):
         return visitor.visit_ident(self)
 
+    def __str__(self):
+        return self.ident_tok.name
+
+
+class AbsoluteName(Ast):
+
+    def __init__(self, module_path, ident_tok):
+        Ast.__init__(self)
+        self.module_path = module_path
+        self.ident_tok = ident_tok
+
+    def accept(self, visitor):
+        return visitor.visit_abs_name(self)
+
+    def __str__(self):
+        segments = [m.name for m in self.module_path]
+        segments.append(self.ident_tok.name)
+        return "::".join(segments)
+
 
 class Symbol(Ast):
 
