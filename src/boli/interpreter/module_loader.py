@@ -43,13 +43,19 @@ def require(interpreter, args):
     else:
         raise InterpreterError("require must not be called with more than two arguments")
 
-    module_interpreter = interpreter.new_child()
+    module_interpreter = interpreter.new_with_global_env()
+    values_before = module_interpreter.get_environment().get_values().copy()
     ModuleLoader().load_module(module_interpreter, module_name)
     module_values = module_interpreter.get_environment().get_values()
 
     env = interpreter.get_environment()
     for key, value in module_values.items():
+        if key in values_before:
+            continue
+        if "::" in key:  # do not provide imported values
+            continue
         if alias_name:
             env.insert(f"{alias_name}::{key}", value)
         else:
             env.insert(key, value)
+

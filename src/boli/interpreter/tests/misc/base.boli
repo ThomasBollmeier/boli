@@ -1,0 +1,3 @@
+(def (make-greeter prefix suffix)
+    (lambda (name)
+        (str-concat prefix name suffix)))

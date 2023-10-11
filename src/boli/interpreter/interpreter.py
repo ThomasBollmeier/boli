@@ -17,6 +17,10 @@ class Interpreter(AstVisitor):
         else:
             self._cur_env = env
 
+    @staticmethod
+    def new_with_global_env():
+        return Interpreter()
+
     def new_child(self):
         return Interpreter(Environment(self._cur_env))
 

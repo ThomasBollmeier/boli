@@ -1,5 +1,3 @@
-(def (make-greeter prefix suffix)
-    (lambda (name)
-        (str-concat prefix name suffix)))
+(require misc::base)
 
 (def guten-tag (make-greeter "Guten Tag, " "!"))
