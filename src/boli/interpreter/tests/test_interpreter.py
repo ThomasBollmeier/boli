@@ -1,6 +1,6 @@
 from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.values import *
-
+import pytest
 
 class TestInterpreter:
 
@@ -284,6 +284,17 @@ class TestInterpreter:
         value = Interpreter().eval_program(code)
         assert isinstance(value, String)
         assert str(value) == '"Guten Tag, Thomas!"'
+
+    def test_require_w_error(self):
+        code = """
+        (require misc::util ut)
+        (def (main)
+            (def hello (ut::make-greeter "Hello " "!"))
+            (hello "Thomas"))
+        (main)
+        """
+        with pytest.raises(InterpreterError) as error:
+            Interpreter().eval_program(code)
 
     @staticmethod
     def _eval_code(code, expected_type):

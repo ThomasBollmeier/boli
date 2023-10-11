@@ -12,7 +12,7 @@ class Environment:
 
     def lookup(self, name):
         if name in self._values:
-            return self._values[name]
+            return self._values[name][0]
         elif self._parent:
             return self._parent.lookup(name)
         return None
@@ -25,52 +25,57 @@ class Environment:
         else:
             return None
 
-    def insert(self, name, value):
-        self._values[name] = value
+    def insert(self, name, value, owned=True):
+        self._values[name] = (value, owned)
 
-    def get_values(self):
-        return self._values
+    def get_owned_values(self):
+        ret = {}
+        for key, entry in self._values.items():
+            value, owned = entry
+            if owned:
+                ret[key] = value
+        return ret
 
 
 def create_global_environment() -> Environment:
     
     ret = Environment()
-    ret.insert("+", add)
-    ret.insert("-", sub)
-    ret.insert("*", mult)
-    ret.insert("/", div)
-    ret.insert("^", exp)
-    ret.insert("%", mod)
-    ret.insert("=", eq)
-    ret.insert(">", gt)
-    ret.insert(">=", ge)
-    ret.insert("<", lt)
-    ret.insert("<=", le)
-    ret.insert("and", and_)
-    ret.insert("or", or_)
-    ret.insert("not", not_)
-    ret.insert("if", if_)
-    ret.insert("write", write)
-    ret.insert("writeln", writeln)
-    ret.insert("set!", set_bang)
-    ret.insert("head", head)
-    ret.insert("tail", tail)
-    ret.insert("list-ref", list_ref)
-    ret.insert("list-set!", list_set_bang)
-    ret.insert("concat", concat)
-    ret.insert("count", count)
-    ret.insert("empty?", is_empty)
-    ret.insert("cons", cons)
-    ret.insert("create-hash-table", create_hash_table)
-    ret.insert("hash-set!", hash_set_bang)
-    ret.insert("hash-remove!", hash_remove_bang)
-    ret.insert("hash-exists?", hash_exists)
-    ret.insert("hash-ref", hash_ref)
-    ret.insert("str-sub", str_sub)
-    ret.insert("str-replace", str_replace)
-    ret.insert("str-concat", str_concat)
-    ret.insert("str-upper", str_upper)
-    ret.insert("str-lower", str_lower)
-    ret.insert("require", require)
+    ret.insert("+", add, owned=False)
+    ret.insert("-", sub, owned=False)
+    ret.insert("*", mult, owned=False)
+    ret.insert("/", div, owned=False)
+    ret.insert("^", exp, owned=False)
+    ret.insert("%", mod, owned=False)
+    ret.insert("=", eq, owned=False)
+    ret.insert(">", gt, owned=False)
+    ret.insert(">=", ge, owned=False)
+    ret.insert("<", lt, owned=False)
+    ret.insert("<=", le, owned=False)
+    ret.insert("and", and_, owned=False)
+    ret.insert("or", or_, owned=False)
+    ret.insert("not", not_, owned=False)
+    ret.insert("if", if_, owned=False)
+    ret.insert("write", write, owned=False)
+    ret.insert("writeln", writeln, owned=False)
+    ret.insert("set!", set_bang, owned=False)
+    ret.insert("head", head, owned=False)
+    ret.insert("tail", tail, owned=False)
+    ret.insert("list-ref", list_ref, owned=False)
+    ret.insert("list-set!", list_set_bang, owned=False)
+    ret.insert("concat", concat, owned=False)
+    ret.insert("count", count, owned=False)
+    ret.insert("empty?", is_empty, owned=False)
+    ret.insert("cons", cons, owned=False)
+    ret.insert("create-hash-table", create_hash_table, owned=False)
+    ret.insert("hash-set!", hash_set_bang, owned=False)
+    ret.insert("hash-remove!", hash_remove_bang, owned=False)
+    ret.insert("hash-exists?", hash_exists, owned=False)
+    ret.insert("hash-ref", hash_ref, owned=False)
+    ret.insert("str-sub", str_sub, owned=False)
+    ret.insert("str-replace", str_replace, owned=False)
+    ret.insert("str-concat", str_concat, owned=False)
+    ret.insert("str-upper", str_upper, owned=False)
+    ret.insert("str-lower", str_lower, owned=False)
+    ret.insert("require", require, owned=False)
 
     return ret
