@@ -15,6 +15,7 @@ class TestParser:
                      'male
                      'female))
         (def my-add1 (lambda (x) (+ x 1)))
+        (def my-add2 (λ (x) (+ x 1)))
         (def (my-sum numbers...)
             (+ ...numbers))
             

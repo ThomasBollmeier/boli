@@ -58,6 +58,7 @@ KEYWORDS = {
     "def-struct": TokenType.DEF_STRUCT,
     "if": TokenType.IF,
     "lambda": TokenType.LAMBDA,
+    "λ": TokenType.LAMBDA,
     "block": TokenType.BLOCK,
     "cond": TokenType.COND,
     "let": TokenType.LET

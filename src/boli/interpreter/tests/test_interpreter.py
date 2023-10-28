@@ -185,7 +185,7 @@ class TestInterpreter:
 
         code = """
         (def (make-adder n)
-            (lambda (m)
+            (λ (m)
                 (+ m n)))
         ((make-adder 3) 39)    
         """

@@ -10,11 +10,11 @@ class TestLexer:
         code = """
         ( ( ) {} [] "\\"Test\\" 1\\2" 42 is-this-an-identifier? + - * / 
         def if) ^ % 'a-symbol nil = > >= < <= ... block cond let
-        module::identifier
+        module::identifier λ
         """
         tokens = self._create_lexer(code).fetch_all_tokens()
 
-        assert len(tokens) == 33
+        assert len(tokens) == 34
         self._assert_token_type(tokens, 0, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 1, TokenType.LEFT_PAREN)
         self._assert_token_type(tokens, 2, TokenType.RIGHT_PAREN)
@@ -52,6 +52,7 @@ class TestLexer:
         self._assert_token_type(tokens, 30, TokenType.IDENT)
         self._assert_token_type(tokens, 31, TokenType.MODULE_SEP)
         self._assert_token_type(tokens, 32, TokenType.IDENT)
+        self._assert_token_type(tokens, 33, TokenType.LAMBDA)
 
     @pytest.mark.parametrize("num_str, expected_num_val", [
         ("42", 42),
