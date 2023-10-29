@@ -1,0 +1,3 @@
+#!/bin/bash
+PYTHONPATH=$BOLI_HOME/src python3 $BOLI_HOME/src/boli/interpreter/repl.py $1
+
