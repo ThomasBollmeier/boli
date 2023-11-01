@@ -2,6 +2,7 @@ from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.values import *
 import pytest
 
+
 class TestInterpreter:
 
     def test_eval_expr(self):
@@ -295,6 +296,30 @@ class TestInterpreter:
         """
         with pytest.raises(InterpreterError) as error:
             Interpreter().eval_program(code)
+
+    def test_require_non_toplevel(self):
+        code = """
+        (def (main)
+            (require misc::util ut)
+            (ut::guten-tag "Thomas"))
+        (main)
+        """
+        with pytest.raises(InterpreterError) as error:
+            Interpreter().eval_program(code)
+
+    def test_provide(self):
+        code = """
+        (require misc::greetings)
+        (def hello (create-greeter "Hello " "!"))
+        (def (main)
+            (str-concat (guten-tag "Thomas")
+                        " and "
+                        (hello "Tom")))
+        (main)
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, String)
+        assert str(value) == '"Guten Tag, Thomas! and Hello Tom!"'
 
     @staticmethod
     def _eval_code(code, expected_type):

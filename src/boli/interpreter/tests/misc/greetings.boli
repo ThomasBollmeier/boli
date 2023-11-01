@@ -1,0 +1,5 @@
+(require misc::export_base)
+(provide guten-tag
+         [mk-greeter create-greeter])
+
+(def guten-tag (mk-greeter "Guten Tag, " "!"))

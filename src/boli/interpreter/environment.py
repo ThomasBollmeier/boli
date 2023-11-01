@@ -1,6 +1,6 @@
 from boli.interpreter.builtin import *
 from boli.interpreter.list_functions import *
-from boli.interpreter.module_loader import require
+from boli.interpreter.module_loader import require, provide
 from boli.interpreter.string_functions import *
 
 
@@ -9,6 +9,9 @@ class Environment:
     def __init__(self, parent=None):
         self._parent = parent
         self._values = {}
+
+    def is_toplevel(self):
+        return self._parent is None
 
     def lookup(self, name):
         if name in self._values:
@@ -28,7 +31,7 @@ class Environment:
     def insert(self, name, value, owned=True):
         self._values[name] = (value, owned)
 
-    def get_owned_values(self):
+    def get_exported_values(self):
         ret = {}
         for key, entry in self._values.items():
             value, owned = entry
@@ -37,9 +40,29 @@ class Environment:
         return ret
 
 
+class ModuleEnvironment(Environment):
+
+    def __init__(self):
+        Environment.__init__(self, parent=None)
+        self._exports = []
+
+    def add_export(self, name, export_alias=None):
+        self._exports.append((name, export_alias))
+
+    def get_exported_values(self):
+        if self._exports:
+            ret = {}
+            for name, alias in self._exports:
+                exported_name = alias if alias else name
+                ret[exported_name] = self._values[name][0]
+            return ret
+        else:
+            return Environment.get_exported_values(self)
+
+
 def create_global_environment() -> Environment:
     
-    ret = Environment()
+    ret = ModuleEnvironment()
     ret.insert("+", add, owned=False)
     ret.insert("-", sub, owned=False)
     ret.insert("*", mult, owned=False)
@@ -77,5 +100,6 @@ def create_global_environment() -> Environment:
     ret.insert("str-upper", str_upper, owned=False)
     ret.insert("str-lower", str_lower, owned=False)
     ret.insert("require", require, owned=False)
+    ret.insert("provide", provide, owned=False)
 
     return ret

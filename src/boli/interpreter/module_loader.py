@@ -1,5 +1,7 @@
 import os.path
 from os.path import abspath, dirname, sep
+
+from boli.frontend.ast import Identifier, AbsoluteName, Call
 from boli.interpreter.error import InterpreterError
 from boli.interpreter.values import BuiltInFuncLazy
 
@@ -33,6 +35,9 @@ class ModuleLoader:
 
 @BuiltInFuncLazy
 def require(interpreter, args):
+    module_env = interpreter.get_environment()
+    if not module_env.is_toplevel():
+        raise InterpreterError("require can only used on top level")
     num_args = len(args)
     if num_args == 1:
         module_name = str(args[0])
@@ -45,9 +50,31 @@ def require(interpreter, args):
 
     module_interpreter = interpreter.new_with_global_env()
     ModuleLoader().load_module(module_interpreter, module_name)
-    owned_values = module_interpreter.get_environment().get_owned_values()
+    exported_values = module_interpreter.get_environment().get_exported_values()
 
     env = interpreter.get_environment()
-    for key, value in owned_values.items():
+    for key, value in exported_values.items():
         name = f"{alias_name}::{key}" if alias_name else key
         env.insert(name, value, owned=False)
+
+
+@BuiltInFuncLazy
+def provide(interpreter, args):
+    from boli.interpreter.environment import ModuleEnvironment
+    module_env = interpreter.get_environment()
+    if not isinstance(module_env, ModuleEnvironment):
+        raise InterpreterError("provide can only used on top level")
+    for arg in args:
+        if isinstance(arg, Identifier) or isinstance(arg, AbsoluteName):
+            name = str(arg)
+            module_env.add_export(name)
+        elif isinstance(arg, Call):
+            name_ast = arg.callee
+            alias_ast = arg.args[0]
+            if not isinstance(name_ast, Identifier) and not isinstance(name_ast, AbsoluteName):
+                raise InterpreterError("invalid argument for provide")
+            if not isinstance(alias_ast, Identifier):
+                raise InterpreterError("invalid argument for provide")
+            module_env.add_export(str(name_ast), str(alias_ast))
+        else:
+            raise InterpreterError("invalid argument for provide")
