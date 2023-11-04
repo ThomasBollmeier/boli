@@ -186,9 +186,9 @@ class Call(Ast):
 
 class VarArg(Ast):
 
-    def __init__(self, ident_tok):
+    def __init__(self, expr):
         Ast.__init__(self)
-        self.ident_tok = ident_tok
+        self.expr = expr
 
     def accept(self, visitor):
         return visitor.visit_vararg(self)

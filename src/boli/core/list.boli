@@ -49,3 +49,10 @@
             acc
             (reverse-helper (tail lst) (cons (head lst) acc))))
     (reverse-helper lst '()))
+
+(def (range from to)
+    (def (range-helper from to acc)
+        (if (>= from to)
+            (reverse acc)
+            (range-helper (+ from 1) to (cons from acc))))
+    (range-helper from to '()))

@@ -166,6 +166,15 @@ class TestListFunctions:
 
         self._assert_code(code, "'(4 3 2 1)")
 
+    def test_range(self):
+        code = """
+         (def (main)
+             (range 1 5))
+         (main)
+         """
+
+        self._assert_code(code, "'(1 2 3 4)")
+
     @staticmethod
     def _assert_code(code, expected_value, expected_type=None):
         expected_type = expected_type or List

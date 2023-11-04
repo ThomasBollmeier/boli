@@ -110,7 +110,10 @@ class AstPrinter(AstVisitor):
         self._indent -= 1
 
     def visit_vararg(self, vararg):
-        self._write(f"VarArg({vararg.ident_tok.name})")
+        self._write(f"VarArg:")
+        self._indent += 1
+        vararg.expr.accept(self)
+        self._indent -= 1
 
     def visit_builtin_op(self, builtin_op):
         operator = ""

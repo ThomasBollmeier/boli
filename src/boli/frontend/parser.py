@@ -307,8 +307,7 @@ class Parser:
                 break
             if next_token.token_type == TokenType.DOT_3:  # <-- vararg encountered
                 self._advance()
-                ident_tok = self._advance([TokenType.IDENT])
-                args.append(VarArg(ident_tok))
+                args.append(VarArg(self.expression()))
                 self._advance([end_token_type])
                 break
             args.append(self.expression())

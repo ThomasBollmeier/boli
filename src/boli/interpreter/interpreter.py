@@ -135,10 +135,7 @@ class Interpreter(AstVisitor):
         return arg_vals
 
     def visit_vararg(self, vararg):
-        vararg_name = vararg.ident_tok.name
-        vararg_value = self._cur_env.lookup(vararg_name)
-        if vararg_value is None:
-            raise InterpreterError(f"Identifier '{vararg_name}' is unknown")
+        vararg_value = vararg.expr.accept(self)
         if not isinstance(vararg_value, List):
             raise InterpreterError("Vararg must be of list type")
         return [it for it in vararg_value.items]

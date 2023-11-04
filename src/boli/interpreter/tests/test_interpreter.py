@@ -112,6 +112,18 @@ class TestInterpreter:
         assert isinstance(value, Integer)
         assert str(value) == "10"
 
+    def test_function_call_w_varargs_expr(self):
+
+        code = """
+        (require list)
+        (def sum-1-to-4 (+ ...(range 1 5)))
+        sum-1-to-4
+        """
+
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, Integer)
+        assert str(value) == "10"
+
     def test_recursive_call(self):
 
         code = """
