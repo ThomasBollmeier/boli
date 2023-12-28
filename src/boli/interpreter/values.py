@@ -81,6 +81,161 @@ class List(Value):
         return "'(" + " ".join([str(item) for item in self.items]) + ")"
 
 
+class ListIteratorInterface:
+
+    def get_next(self):
+        return None
+
+    def is_done(self):
+        return True
+
+    def clone(self):
+        return self
+
+
+class ListIter(ListIteratorInterface):
+
+    def __init__(self, items, start_index=0) -> ListIteratorInterface:
+        super().__init__()
+        self.items = items
+        self.index = start_index
+
+    def clone(self):
+        return ListIter(self.items, self.index)
+
+    def get_next(self):
+        if self.index < len(self.items):
+            ret = self.items[self.index]
+            self.index += 1
+            return ret
+        else:
+            return None
+
+    def is_done(self):
+        return self.index >= len(self.items)
+
+
+class MapAction:
+
+    def __init__(self, map_lambda):
+        self.map_lambda = map_lambda
+
+    def __call__(self, item):
+        return self.map_lambda([item]), True
+
+    def reset(self):
+        pass
+
+
+class FilterAction:
+
+    def __init__(self, predicate_lambda):
+        self.predicate_lambda = predicate_lambda
+
+    def __call__(self, item):
+        bool_value = self.predicate_lambda([item])
+        return item, bool_value.value
+
+    def reset(self):
+        pass
+
+
+class DropAction:
+
+    def __init__(self, n):
+        self.n = n
+        self.cnt_dropped = 0
+
+    def __call__(self, item):
+        is_ok = self.cnt_dropped >= self.n
+        if self.cnt_dropped < self.n:
+            self.cnt_dropped += 1
+        return item, is_ok
+
+    def reset(self):
+        self.cnt_dropped = 0
+
+
+class DropWhileAction:
+
+    def __init__(self, predicate_lambda):
+        self.predicate_lambda = predicate_lambda
+        self.done = False
+
+    def __call__(self, item):
+        if not self.done:
+            self.done = not self.predicate_lambda([item]).value
+        return item, self.done
+
+    def reset(self):
+        self.done = False
+
+
+class LazyList(Value):
+
+    def __init__(self, iterator, actions=None):
+        super().__init__()
+        self.iterator = iterator
+        self.actions = actions if actions else []
+
+    def map(self, fn):
+        return LazyList(self.iterator.clone(), self.actions + [MapAction(fn)])
+
+    def filter(self, fn):
+        return LazyList(self.iterator.clone(), self.actions + [FilterAction(fn)])
+
+    def drop(self, n):
+        return LazyList(self.iterator.clone(), self.actions + [DropAction(n)])
+
+    def drop_while(self, fn):
+        return LazyList(self.iterator.clone(),
+                        self.actions + [DropWhileAction(fn)])
+
+    def take(self, n) -> List:
+        items = []
+        iterator = self.iterator.clone()
+        for action in self.actions:
+            action.reset()
+
+        while not iterator.is_done():
+            if len(items) >= n:
+                break
+            item = iterator.get_next()
+            is_ok = True
+            for action in self.actions:
+                item, is_ok = action(item)
+                if not is_ok:
+                    break
+            if is_ok:
+                items.append(item)
+
+        return List(items)
+
+    def take_while(self, fn) -> List:
+        items = []
+        iterator = self.iterator.clone()
+        for action in self.actions:
+            action.reset()
+
+        while not iterator.is_done():
+            item = iterator.get_next()
+            is_ok = True
+            for action in self.actions:
+                item, is_ok = action(item)
+                if not is_ok:
+                    break
+            if is_ok:
+                if fn([item]).value:
+                    items.append(item)
+                else:
+                    break
+
+        return List(items)
+
+    def __str__(self):
+        return "<LazyList>"
+
+
 class HashTable(Value):
 
     def __init__(self):
@@ -198,12 +353,13 @@ class StructType(Value):
         self.field_indices = dict(zip(fields, range(len(fields))))
 
     def __str__(self):
-        return f"""(def-struct {self.name} ({" ".join(self.fields) }))"""
+        return f"""(def-struct {self.name} ({" ".join(self.fields)}))"""
 
     def make_create(self):
         @BuiltInFunc
         def create(field_values):
             return Struct(self, field_values)
+
         return create
 
     def make_getter(self, field):
@@ -212,6 +368,7 @@ class StructType(Value):
             instance = args[0]
             field_idx = self.field_indices[field]
             return instance.field_values[field_idx]
+
         return getter
 
     def make_setter(self, field):
@@ -221,6 +378,7 @@ class StructType(Value):
             field_idx = self.field_indices[field]
             instance.field_values[field_idx] = field_value
             return Nil()
+
         return setter
 
 

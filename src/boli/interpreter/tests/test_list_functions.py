@@ -175,6 +175,23 @@ class TestListFunctions:
 
         self._assert_code(code, "'(1 2 3 4)")
 
+    def test_drop_while(self):
+        code = """
+        (require list l)
+        (def lst (l::range 1 11))
+        (take 3 (drop-while (λ (x) (> 40 (* x x))) lst))
+        """
+
+        self._assert_code(code, "'(7 8 9)")
+
+    def test_take_while(self):
+        code = """
+        (require list l)
+        (def lst (l::range 1 11))
+        (take-while (λ (x) (> 40 (* x x))) lst)
+        """
+        self._assert_code(code, "'(1 2 3 4 5 6)")
+
     @staticmethod
     def _assert_code(code, expected_value, expected_type=None):
         expected_type = expected_type or List

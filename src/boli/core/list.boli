@@ -1,34 +1,5 @@
 ;; Various functions on lists
 
-(def (take n lst)
-    (def (take-helper n lst acc)
-        (if (or (= n 0) (empty? lst))
-            (reverse acc)
-            (take-helper (- n 1) (tail lst) (cons (head lst) acc))))
-    (take-helper n lst '()))
-
-(def (drop n lst)
-    (if (or (= n 0) (empty? lst))
-        lst
-        (drop (-n 1) (tail lst))))
-
-(def (filter pred lst)
-    (def (filter-helper lst acc)
-        (if (empty? lst)
-            (reverse acc)
-            (let [(item (head lst))]
-                (if (pred item)
-                    (filter-helper (tail lst) (cons item acc))
-                    (filter-helper (tail lst) acc)))))
-    (filter-helper lst '()))
-
-(def (map fn lst)
-    (def (map-helper lst acc)
-        (if (empty? lst)
-            (reverse acc)
-            (map-helper (tail lst) (cons (fn (head lst)) acc))))
-    (map-helper lst '()))
-
 (def (foldl fn init-val lst)
     (def (foldl-helper lst acc)
         (if (empty? lst)
