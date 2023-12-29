@@ -4,6 +4,17 @@ from boli.interpreter.values import ListIter, LazyList, Integer
 
 class TestLazyList:
 
+    def test_head(self):
+        interpreter = Interpreter()
+        code = """
+        (require list l)
+        (def lst (lazy-list ...(l::range 1 11)))
+        (head (drop 3 lst))
+        """
+        actual = interpreter.eval_program(code)
+        assert (str(actual) == "4")
+
+
     def test_filter(self):
         interpreter = Interpreter()
         code = """
@@ -14,6 +25,7 @@ class TestLazyList:
         """
         actual = interpreter.eval_program(code)
         assert (str(actual) == "'(2 4 6)")
+
 
     def test_map(self):
         interpreter = Interpreter()

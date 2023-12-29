@@ -8,7 +8,7 @@ def head(args):
     if isinstance(lst, List):
         return args[0].items[0]
     elif isinstance(lst, LazyList):
-        return lst.take(1)
+        return lst.take(1).items[0]
 
 
 @BuiltInFunc
