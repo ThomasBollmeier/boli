@@ -95,7 +95,7 @@ class ListIteratorInterface:
 
 class ListIter(ListIteratorInterface):
 
-    def __init__(self, items, start_index=0) -> ListIteratorInterface:
+    def __init__(self, items, start_index=0):
         super().__init__()
         self.items = items
         self.index = start_index
@@ -113,6 +113,23 @@ class ListIter(ListIteratorInterface):
 
     def is_done(self):
         return self.index >= len(self.items)
+
+
+class NaturalNumberIter(ListIteratorInterface):
+
+    def __init__(self, start=0):
+        self._start = start
+
+    def clone(self):
+        return NaturalNumberIter(self._start)
+
+    def get_next(self):
+        ret = Integer(self._start)
+        self._start += 1
+        return ret
+    
+    def is_done(self):
+        return False
 
 
 class MapAction:

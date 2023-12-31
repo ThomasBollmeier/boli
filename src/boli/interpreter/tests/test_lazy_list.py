@@ -67,3 +67,11 @@ class TestLazyList:
         """
         actual = interpreter.eval_program(code)
         assert (str(actual) == "'(1 2 3 4 5 6)")
+
+    def test_naturals(self):
+        interpreter = Interpreter()
+        code = """
+        (take-while (λ (x) (> 40 (* x x))) (naturals 2))
+        """
+        actual = interpreter.eval_program(code)
+        assert (str(actual) == "'(2 3 4 5 6)")

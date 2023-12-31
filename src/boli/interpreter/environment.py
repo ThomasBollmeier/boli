@@ -96,6 +96,7 @@ def create_global_environment() -> Environment:
     ret.insert("empty?", is_empty, owned=False)
     ret.insert("cons", cons, owned=False)
     ret.insert("lazy-list", lazy_list, owned=False)
+    ret.insert("naturals", naturals, owned=False)
     ret.insert("create-hash-table", create_hash_table, owned=False)
     ret.insert("hash-set!", hash_set_bang, owned=False)
     ret.insert("hash-remove!", hash_remove_bang, owned=False)

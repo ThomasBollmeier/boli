@@ -1,4 +1,4 @@
-from boli.interpreter.values import BuiltInFunc, List, LazyList, ListIter, Nil
+from boli.interpreter.values import BuiltInFunc, List, LazyList, ListIter, Nil, NaturalNumberIter
 from boli.interpreter.error import InterpreterError
 
 
@@ -130,3 +130,10 @@ def cons(args):
 @BuiltInFunc
 def lazy_list(args):
     return LazyList(ListIter(args))
+
+
+@BuiltInFunc
+def naturals(args):
+    start = 0 if not args else args[0].value
+    return LazyList(NaturalNumberIter(start))
+
