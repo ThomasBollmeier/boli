@@ -7,12 +7,12 @@ BOLI_VERSION = "0.4.3"
 
 
 def run():
-    parser = ArgumentParser('Run a boli program')
+    parser = ArgumentParser(description = 'Run a boli program')
     parser.add_argument('source_file',
                         nargs='?')
     parser.add_argument('--version',
                         action='version',
-                        version=BOLI_VERSION)
+                        version=f"B(ollmeier's) O(wn) L(isp) I(mplementation) {BOLI_VERSION}")
 
     args = parser.parse_args()
 
