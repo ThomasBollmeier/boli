@@ -74,6 +74,16 @@ class TestInterpreter:
         value = self._eval_code(code, String)
         assert str(value) == '"the answer to everything"'
 
+    def test_quotation(self):
+        code = """
+        (def lst '(if (= 1 1) "wahr" "falsch"))
+        lst    
+        """
+        value = Interpreter().eval_program(code)
+        assert type(value) == List
+        if_ = value.items[0]
+        assert str(if_) == "Keyword(if)"
+
     def test_cond_expr(self):
 
         code = """

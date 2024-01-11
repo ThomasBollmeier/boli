@@ -69,6 +69,16 @@ class Symbol(Value):
 
     def __str__(self):
         return f"'{self.value}"
+    
+
+class Keyword(Value):
+
+    def __init__(self, keyword):
+        super().__init__()
+        self.keyword = keyword
+
+    def __str__(self):
+        return f"Keyword({self.keyword})"
 
 
 class List(Value):

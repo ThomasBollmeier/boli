@@ -2,10 +2,9 @@ from boli.frontend.source import Source
 from boli.frontend.parser import Parser
 from boli.frontend.ast import BuiltInOperator, Identifier, Call, AbsoluteName
 from boli.frontend.ast_visitor import AstVisitor
-from boli.frontend.tokens import OP_TYPE_TO_STR
+from boli.frontend.tokens import OP_TYPE_TO_STR, KEYWORDS
 from boli.interpreter.environment import create_global_environment, Environment
-from boli.interpreter.values import Callable, Value, Integer, Real, String, Bool, Nil, Lambda, List, TailCall, Symbol, \
-    StructType
+from boli.interpreter.values import *
 from boli.interpreter.error import InterpreterError
 
 
@@ -16,6 +15,10 @@ class Interpreter(AstVisitor):
             self._cur_env = create_global_environment()
         else:
             self._cur_env = env
+
+        self._kw_token_type_to_str = {}
+        for kw, kw_token_type in KEYWORDS.items():
+            self._kw_token_type_to_str[kw_token_type] = kw
 
     @staticmethod
     def new_with_global_env():
@@ -70,7 +73,8 @@ class Interpreter(AstVisitor):
         return Symbol(symbol.symbol_tok.name)
 
     def visit_keyword(self, keyword):
-        pass
+        kw_token_type = keyword.keyword_tok.token_type
+        return Keyword(self._kw_token_type_to_str[kw_token_type])
 
     def visit_struct(self, struct):
         name = struct.name_tok.name
