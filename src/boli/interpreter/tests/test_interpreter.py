@@ -343,6 +343,18 @@ class TestInterpreter:
         assert isinstance(value, String)
         assert str(value) == '"Guten Tag, Thomas! and Hello Tom!"'
 
+    def test_list(self):
+        code = """
+        (def (main)
+            (def answer 42)
+            (def lst (list answer (+ 41 1)))
+            lst)
+        (main)
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, List)
+        assert str(value) == "'(42 42)"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

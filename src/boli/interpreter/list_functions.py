@@ -3,6 +3,11 @@ from boli.interpreter.error import InterpreterError
 
 
 @BuiltInFunc
+def list_(args):
+    return List(args)
+
+
+@BuiltInFunc
 def head(args):
     lst = args[0]
     if isinstance(lst, List):

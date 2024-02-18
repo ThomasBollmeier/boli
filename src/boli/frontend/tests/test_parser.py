@@ -144,3 +144,18 @@ class TestParser:
 
         ast.accept(AstPrinter())
 
+    def test_list(self):
+        code = """
+        (def (main)
+            (def answer 42)
+            (def lst (list answer (+ 41 1)))
+            lst)
+        (main)
+        """
+
+        ast = Parser(Source(code)).program()
+
+        assert ast is not None
+
+        ast.accept(AstPrinter())
+

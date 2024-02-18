@@ -3,7 +3,7 @@ from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.error import InterpreterError
 from boli.frontend.parser import ParseError
 
-BOLI_VERSION = "0.4.4"
+BOLI_VERSION = "0.4.5"
 
 
 def run():
