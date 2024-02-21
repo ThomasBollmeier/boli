@@ -1,4 +1,5 @@
-from boli.interpreter.values import BuiltInFunc, List, LazyList, ListIter, Nil, NaturalNumberIter
+from boli.interpreter.values import BuiltInFunc, List, LazyList, ListIter, Nil, NaturalNumberIter, \
+    LambdaIterator
 from boli.interpreter.error import InterpreterError
 
 
@@ -141,4 +142,10 @@ def lazy_list(args):
 def naturals(args):
     start = 0 if not args else args[0].value
     return LazyList(NaturalNumberIter(start))
+
+
+@BuiltInFunc
+def iterator(args):
+    start_value, lambda_ = args
+    return LazyList(LambdaIterator(start_value, lambda_))
 

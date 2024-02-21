@@ -355,6 +355,17 @@ class TestInterpreter:
         assert isinstance(value, List)
         assert str(value) == "'(42 42)"
 
+    def test_iterator(self):
+        code = """
+        (def (main)
+            (def even-numbers (iterator 0 (λ (n) (+ n 2))))
+            (take 5 even-numbers))
+        (main)
+        """
+        value = Interpreter().eval_program(code)
+        assert isinstance(value, List)
+        assert str(value) == "'(0 2 4 6 8)"
+
     @staticmethod
     def _eval_code(code, expected_type):
         interpreter = Interpreter()

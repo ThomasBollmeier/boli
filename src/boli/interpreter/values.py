@@ -142,6 +142,24 @@ class NaturalNumberIter(ListIteratorInterface):
         return False
 
 
+class LambdaIterator(ListIteratorInterface):
+
+    def __init__(self, start_value, lambda_):
+        self._next_value = start_value
+        self._lambda = lambda_
+
+    def get_next(self):
+        ret = self._next_value
+        self._next_value = self._lambda([self._next_value])
+        return ret
+
+    def is_done(self):
+        return isinstance(self._next_value, Nil)
+
+    def clone(self):
+        return LambdaIterator(self._next_value, self._lambda)
+
+
 class MapAction:
 
     def __init__(self, map_lambda):
