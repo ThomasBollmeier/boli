@@ -3,7 +3,7 @@ from boli.interpreter.interpreter import Interpreter
 from boli.interpreter.error import InterpreterError
 from boli.frontend.parser import ParseError
 
-BOLI_VERSION = "0.4.6"
+BOLI_VERSION = "0.4.7"
 
 
 def run():
@@ -38,11 +38,19 @@ def repl():
             if stop:
                 break
             if code:
-                value = interpreter.eval_program(code)
+                value = _eval_code(interpreter, code)
                 print(value)
         except (ParseError, InterpreterError, FileNotFoundError) as error:
             print(error)
         code = ""
+
+
+def _eval_code(interpreter, code):
+    try:
+        value = interpreter.eval_program(code)
+    except NotImplementedError:
+        value = interpreter.eval_expr(code)
+    return value
 
 
 def _handle_command(interpreter, code):
