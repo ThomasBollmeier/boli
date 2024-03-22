@@ -80,6 +80,8 @@ def create_global_environment() -> Environment:
     ret.insert("if", if_, owned=False)
     ret.insert("write", write, owned=False)
     ret.insert("writeln", writeln, owned=False)
+    ret.insert("display", display, owned=False)
+    ret.insert("displayln", displayln, owned=False)
     ret.insert("set!", set_bang, owned=False)
     ret.insert("list", list_, owned=False)
     ret.insert("head", head, owned=False)

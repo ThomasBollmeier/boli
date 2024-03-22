@@ -141,6 +141,27 @@ def writeln(args):
     return Nil()
 
 
+@BuiltInFunc
+def display(args):
+    for arg in args:
+        s = str(arg)
+        if s[0] == '"':
+            s = s[1:-1]
+        print(s, end=" ")
+    return Nil()
+
+
+@BuiltInFunc
+def displayln(args):
+    for arg in args:
+        s = str(arg)
+        if s[0] == '"':
+            s = s[1:-1]
+        print(s, end=" ")
+    print()
+    return Nil()
+
+
 @BuiltInFuncLazy
 def set_bang(interpreter, args):
     if len(args) != 2:
